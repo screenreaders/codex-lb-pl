@@ -15,11 +15,11 @@ export function useSettings() {
   const updateSettingsMutation = useMutation({
     mutationFn: (payload: SettingsUpdateRequest) => updateSettings(payload),
     onSuccess: () => {
-      toast.success("Settings saved");
+      toast.success("Ustawienia zapisane");
       void queryClient.invalidateQueries({ queryKey: ["settings", "detail"] });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to save settings");
+      toast.error(error.message || "Nie udało się zapisać ustawień");
     },
   });
 

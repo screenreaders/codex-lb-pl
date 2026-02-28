@@ -24,7 +24,7 @@ import { parseDate } from "@/utils/formatters";
 import { hasLimitRuleChanges, normalizeLimitRules } from "./limit-rules-utils";
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Nazwa jest wymagana"),
   isActive: z.boolean(),
 });
 
@@ -89,14 +89,14 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
         <div className="grid gap-x-6 sm:grid-cols-2">
           {/* Left column — General */}
           <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2">
-            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">General</h4>
+            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Ogólne</h4>
 
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Nazwa</FormLabel>
                   <FormControl>
                     <Input {...field} autoComplete="off" />
                   </FormControl>
@@ -106,12 +106,12 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
             />
 
             <div className="space-y-1">
-              <label className="text-sm font-medium">Allowed models</label>
+              <label className="text-sm font-medium">Dozwolone modele</label>
               <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} />
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium">Expiry</label>
+              <label className="text-sm font-medium">Ważność</label>
               <ExpiryPicker value={expiresAt} onChange={setExpiresAt} />
             </div>
 
@@ -120,7 +120,7 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
               name="isActive"
               render={({ field }) => (
                 <div className="flex items-center justify-between rounded-md border p-2">
-                  <span className="text-sm">Active</span>
+                  <span className="text-sm">Aktywny</span>
                   <Switch checked={field.value} onCheckedChange={field.onChange} />
                 </div>
               )}
@@ -129,12 +129,12 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
 
           {/* Right column — Limits */}
           <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2 max-sm:mt-3 max-sm:border-t max-sm:pt-3">
-            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limits</h4>
+            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limity</h4>
             <LimitRulesEditor rules={limitRules} onChange={setLimitRules} />
 
             {apiKey.limits.length > 0 ? (
               <div className="space-y-1">
-                <label className="text-xs font-medium text-muted-foreground">Current usage</label>
+                <label className="text-xs font-medium text-muted-foreground">Bieżące zużycie</label>
                 <div className="space-y-1">
                   {apiKey.limits.map((limit) => (
                     <LimitUsageBar key={limit.id} limit={limit} />
@@ -147,7 +147,7 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
 
         <DialogFooter className="mt-4">
           <Button type="submit" disabled={busy || form.formState.isSubmitting}>
-            Save
+            Zapisz
           </Button>
         </DialogFooter>
       </form>
@@ -161,8 +161,8 @@ function LimitUsageBar({ limit }: { limit: ApiKey["limits"][number] }) {
   const current = isCost ? `$${(limit.currentValue / 1_000_000).toFixed(2)}` : formatTokenCount(limit.currentValue);
   const max = isCost ? `$${(limit.maxValue / 1_000_000).toFixed(2)}` : formatTokenCount(limit.maxValue);
   const typeLabel = LIMIT_TYPE_SHORT[limit.limitType];
-  const windowLabel = limit.limitWindow;
-  const modelLabel = limit.modelFilter || "all";
+  const windowLabel = LIMIT_WINDOW_SHORT[limit.limitWindow] ?? limit.limitWindow;
+  const modelLabel = limit.modelFilter || "wszystkie";
 
   return (
     <div className="rounded border p-1.5">
@@ -185,10 +185,16 @@ function LimitUsageBar({ limit }: { limit: ApiKey["limits"][number] }) {
 }
 
 const LIMIT_TYPE_SHORT: Record<LimitType, string> = {
-  total_tokens: "Tokens",
-  input_tokens: "Input",
-  output_tokens: "Output",
-  cost_usd: "Cost",
+  total_tokens: "Tokeny",
+  input_tokens: "Wejście",
+  output_tokens: "Wyjście",
+  cost_usd: "Koszt",
+};
+
+const LIMIT_WINDOW_SHORT: Record<string, string> = {
+  daily: "dzienny",
+  weekly: "tygodniowy",
+  monthly: "miesięczny",
 };
 
 function formatTokenCount(n: number): string {
@@ -202,8 +208,8 @@ export function ApiKeyEditDialog({ open, busy, apiKey, onOpenChange, onSubmit }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Edit API key</DialogTitle>
-          <DialogDescription>Update restrictions and lifecycle settings.</DialogDescription>
+          <DialogTitle>Edytuj klucz API</DialogTitle>
+          <DialogDescription>Zaktualizuj ograniczenia i ustawienia cyklu życia.</DialogDescription>
         </DialogHeader>
 
         {apiKey ? (
@@ -215,7 +221,7 @@ export function ApiKeyEditDialog({ open, busy, apiKey, onOpenChange, onSubmit }:
             onClose={() => onOpenChange(false)}
           />
         ) : (
-          <p className="text-sm text-muted-foreground">Select an API key to edit.</p>
+          <p className="text-sm text-muted-foreground">Wybierz klucz API do edycji.</p>
         )}
       </DialogContent>
     </Dialog>

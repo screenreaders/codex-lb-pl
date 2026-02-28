@@ -8,9 +8,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/accounts", label: "Accounts" },
-  { to: "/settings", label: "Settings" },
+  { to: "/dashboard", label: "Panel" },
+  { to: "/accounts", label: "Konta" },
+  { to: "/settings", label: "Ustawienia" },
 ] as const;
 
 export type AppHeaderProps = {
@@ -75,14 +75,14 @@ export function AppHeader({
               className="press-scale hidden h-8 gap-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground sm:inline-flex"
             >
               <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-              Logout
+              Wyloguj
             </Button>
           )}
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button type="button" size="icon" variant="ghost" aria-label="Open menu" className="h-8 w-8 rounded-lg sm:hidden">
+              <Button type="button" size="icon" variant="ghost" aria-label="Otwórz menu" className="h-8 w-8 rounded-lg sm:hidden">
                 <Menu className="h-4 w-4" />
               </Button>
             </SheetTrigger>
@@ -124,7 +124,7 @@ export function AppHeader({
                       }}
                     >
                       <LogOut className="h-3.5 w-3.5" aria-hidden="true" />
-                      Logout
+                      Wyloguj
                     </button>
                   </>
                 )}

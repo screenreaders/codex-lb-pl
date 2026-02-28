@@ -44,13 +44,13 @@ export function ImportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Import auth.json</DialogTitle>
-          <DialogDescription>Upload an exported account auth.json file.</DialogDescription>
+          <DialogTitle>Importuj auth.json</DialogTitle>
+          <DialogDescription>Wgraj wyeksportowany plik konta auth.json.</DialogDescription>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
-            <Label htmlFor="auth-json-file">File</Label>
+            <Label htmlFor="auth-json-file">Plik</Label>
             <Input
               id="auth-json-file"
               type="file"
@@ -67,7 +67,7 @@ export function ImportDialog({
 
           <DialogFooter>
             <Button type="submit" disabled={busy || !file}>
-              Import
+              Importuj
             </Button>
           </DialogFooter>
         </form>

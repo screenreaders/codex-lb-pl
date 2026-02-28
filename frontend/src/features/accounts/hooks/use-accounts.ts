@@ -26,44 +26,44 @@ export function useAccountMutations() {
   const importMutation = useMutation({
     mutationFn: importAccount,
     onSuccess: () => {
-      toast.success("Account imported");
+      toast.success("Konto zaimportowane");
       invalidateAccountRelatedQueries(queryClient);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Import failed");
+      toast.error(error.message || "Import nieudany");
     },
   });
 
   const pauseMutation = useMutation({
     mutationFn: pauseAccount,
     onSuccess: () => {
-      toast.success("Account paused");
+      toast.success("Konto wstrzymane");
       invalidateAccountRelatedQueries(queryClient);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Pause failed");
+      toast.error(error.message || "Wstrzymanie nieudane");
     },
   });
 
   const resumeMutation = useMutation({
     mutationFn: reactivateAccount,
     onSuccess: () => {
-      toast.success("Account resumed");
+      toast.success("Konto wznowione");
       invalidateAccountRelatedQueries(queryClient);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Resume failed");
+      toast.error(error.message || "Wznowienie nieudane");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteAccount,
     onSuccess: () => {
-      toast.success("Account deleted");
+      toast.success("Konto usunięte");
       invalidateAccountRelatedQueries(queryClient);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Delete failed");
+      toast.error(error.message || "Usuwanie nieudane");
     },
   });
 

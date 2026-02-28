@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return applySession(set, session);
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "Failed to refresh session",
+        error: error instanceof Error ? error.message : "Nie udało się odświeżyć sesji",
       });
       throw error;
     } finally {
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return applySession(set, session);
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "Login failed",
+        error: error instanceof Error ? error.message : "Logowanie nieudane",
       });
       throw error;
     } finally {
@@ -92,7 +92,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return applySession(set, session);
     } catch (error) {
       set({
-        error: error instanceof Error ? error.message : "TOTP verification failed",
+        error: error instanceof Error ? error.message : "Weryfikacja TOTP nieudana",
       });
       throw error;
     } finally {

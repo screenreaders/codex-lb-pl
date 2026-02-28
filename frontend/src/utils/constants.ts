@@ -1,26 +1,26 @@
 export const STATUS_LABELS = {
-  active: "Active",
-  paused: "Paused",
-  limited: "Rate limited",
-  exceeded: "Quota exceeded",
-  deactivated: "Deactivated",
+  active: "Aktywne",
+  paused: "Wstrzymane",
+  limited: "Ograniczone",
+  exceeded: "Przekroczony limit",
+  deactivated: "Dezaktywowane",
 } as const;
 
 export const ERROR_LABELS = {
-  rate_limit: "rate limit",
-  quota: "quota",
+  rate_limit: "limit",
+  quota: "limit",
   timeout: "timeout",
   upstream: "upstream",
-  rate_limit_exceeded: "rate limit",
-  usage_limit_reached: "quota",
-  insufficient_quota: "quota",
-  usage_not_included: "quota",
-  quota_exceeded: "quota",
+  rate_limit_exceeded: "limit",
+  usage_limit_reached: "limit",
+  insufficient_quota: "limit",
+  usage_not_included: "limit",
+  quota_exceeded: "limit",
   upstream_error: "upstream",
 } as const;
 
 export const ROUTING_LABELS = {
-  usage_weighted: "usage weighted",
+  usage_weighted: "ważone użyciem",
   round_robin: "round robin",
   sticky: "sticky",
 } as const;
@@ -57,37 +57,37 @@ export const DONUT_COLORS = DONUT_COLORS_LIGHT;
 
 export const MESSAGE_TONE_META = {
   success: {
-    label: "Success",
+    label: "Sukces",
     className: "active",
-    defaultTitle: "Import complete",
+    defaultTitle: "Import zakończony",
   },
   error: {
-    label: "Error",
+    label: "Błąd",
     className: "deactivated",
-    defaultTitle: "Import failed",
+    defaultTitle: "Import nieudany",
   },
   warning: {
-    label: "Warning",
+    label: "Ostrzeżenie",
     className: "limited",
-    defaultTitle: "Attention",
+    defaultTitle: "Uwaga",
   },
   info: {
-    label: "Info",
+    label: "Informacja",
     className: "limited",
-    defaultTitle: "Message",
+    defaultTitle: "Wiadomość",
   },
   question: {
-    label: "Question",
+    label: "Pytanie",
     className: "limited",
-    defaultTitle: "Confirm",
+    defaultTitle: "Potwierdź",
   },
 } as const;
 
 export const REQUEST_STATUS_LABELS: Record<string, string> = {
   ok: "OK",
-  rate_limit: "Rate limit",
-  quota: "Quota",
-  error: "Error",
+  rate_limit: "Limit",
+  quota: "Limit",
+  error: "Błąd",
 };
 
 export const RESET_ERROR_LABEL = "--";

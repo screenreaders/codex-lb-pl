@@ -23,17 +23,17 @@ import { formatCompactNumber, formatTimeLong } from "@/utils/formatters";
 
 function formatExpiry(value: string | null): string {
   if (!value) {
-    return "Never";
+    return "Nigdy";
   }
   const parsed = formatTimeLong(value);
   return `${parsed.date} ${parsed.time}`;
 }
 
 const LIMIT_TYPE_SHORT: Record<LimitType, string> = {
-  total_tokens: "Tokens",
-  input_tokens: "Input",
-  output_tokens: "Output",
-  cost_usd: "Cost",
+  total_tokens: "Tokeny",
+  input_tokens: "Wejście",
+  output_tokens: "Wyjście",
+  cost_usd: "Koszt",
 };
 
 function formatLimitSummary(limits: LimitRule[]): string {
@@ -63,7 +63,7 @@ export type ApiKeyTableProps = {
 
 export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiKeyTableProps) {
   if (keys.length === 0) {
-    return <EmptyState icon={KeyRound} title="No API keys created yet" />;
+    return <EmptyState icon={KeyRound} title="Nie utworzono jeszcze kluczy API" />;
   }
 
   return (
@@ -71,18 +71,18 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
     <Table className="table-fixed">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[12%] pl-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Name</TableHead>
-          <TableHead className="w-[10%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Prefix</TableHead>
-          <TableHead className="w-[14%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Models</TableHead>
-          <TableHead className="w-[24%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Usage</TableHead>
-          <TableHead className="w-[18%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Expiry</TableHead>
+          <TableHead className="w-[12%] pl-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Nazwa</TableHead>
+          <TableHead className="w-[10%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Prefiks</TableHead>
+          <TableHead className="w-[14%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Modele</TableHead>
+          <TableHead className="w-[24%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Użycie</TableHead>
+          <TableHead className="w-[18%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Ważność</TableHead>
           <TableHead className="w-[12%] text-[11px] uppercase tracking-wider text-muted-foreground/80">Status</TableHead>
-          <TableHead className="w-[10%] pr-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Actions</TableHead>
+          <TableHead className="w-[10%] pr-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Akcje</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {keys.map((apiKey) => {
-          const models = apiKey.allowedModels?.join(", ") || "All";
+          const models = apiKey.allowedModels?.join(", ") || "Wszystkie";
           const usageText = formatLimitSummary(apiKey.limits);
 
           return (
@@ -94,7 +94,7 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
               <TableCell className="text-xs text-muted-foreground">{formatExpiry(apiKey.expiresAt)}</TableCell>
               <TableCell>
                 <Badge className={apiKey.isActive ? "bg-emerald-500 text-white" : "bg-zinc-500 text-white"}>
-                  {apiKey.isActive ? "Active" : "Disabled"}
+                  {apiKey.isActive ? "Aktywny" : "Wyłączony"}
                 </Badge>
               </TableCell>
               <TableCell className="pr-4">
@@ -102,22 +102,22 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
                   <DropdownMenuTrigger asChild>
                     <Button type="button" size="icon-sm" variant="ghost" disabled={busy}>
                       <Ellipsis className="size-4" />
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">Akcje</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit(apiKey)}>
                       <Pencil className="size-4" />
-                      Edit
+                      Edytuj
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onRegenerate(apiKey)}>
                       <RefreshCw className="size-4" />
-                      Regenerate
+                      Wygeneruj ponownie
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete(apiKey)}>
                       <Trash2 className="size-4" />
-                      Delete
+                      Usuń
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

@@ -69,9 +69,9 @@ export function AccountsPage() {
     <div className="animate-fade-in-up space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Accounts</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Konta</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage imported accounts and authentication flows.
+          Zarządzaj zaimportowanymi kontami i metodami uwierzytelniania.
         </p>
       </div>
 
@@ -129,10 +129,10 @@ export function AccountsPage() {
 
       <ConfirmDialog
         open={deleteDialog.open}
-        title="Delete account"
-        description="This action removes the account from the load balancer configuration."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        title="Usuń konto"
+        description="Ta akcja usuwa konto z konfiguracji load balancera."
+        confirmLabel="Usuń"
+        cancelLabel="Anuluj"
         onOpenChange={deleteDialog.onOpenChange}
         onConfirm={() => {
           if (!deleteDialog.data) {
@@ -144,7 +144,7 @@ export function AccountsPage() {
         }}
       />
 
-      <LoadingOverlay visible={!!accountsQuery.data && mutationBusy} label="Updating accounts..." />
+      <LoadingOverlay visible={!!accountsQuery.data && mutationBusy} label="Aktualizowanie kont..." />
     </div>
   );
 }

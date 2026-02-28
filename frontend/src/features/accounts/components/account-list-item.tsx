@@ -53,7 +53,7 @@ export function AccountListItem({ account, selected, showAccountId = false, onSe
       <div className="flex items-center gap-2.5">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium">{title}</p>
-          <p className="truncate text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
+          <p className="truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
             {subtitle}
           </p>
         </div>

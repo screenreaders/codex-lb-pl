@@ -22,7 +22,7 @@ export type ModelMultiSelectProps = {
 export function ModelMultiSelect({
   value,
   onChange,
-  placeholder = "All models",
+  placeholder = "Wszystkie modele",
 }: ModelMultiSelectProps) {
   const { data: models = [], isLoading } = useModels();
   const [search, setSearch] = useState("");
@@ -60,7 +60,7 @@ export function ModelMultiSelect({
   }, [onChange]);
 
   const label =
-    value.length === 0 ? placeholder : `${value.length} model${value.length > 1 ? "s" : ""} selected`;
+    value.length === 0 ? placeholder : `Wybrano modeli: ${value.length}`;
 
   return (
     <div className="space-y-1.5">
@@ -72,7 +72,7 @@ export function ModelMultiSelect({
             className="w-full justify-between font-normal"
             disabled={isLoading}
           >
-            <span className="truncate text-left">{isLoading ? "Loading models..." : label}</span>
+            <span className="truncate text-left">{isLoading ? "Ładowanie modeli..." : label}</span>
             <ChevronsUpDown className="ml-1 size-4 shrink-0 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
@@ -81,7 +81,7 @@ export function ModelMultiSelect({
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search models..."
+              placeholder="Szukaj modeli..."
               className="h-7 text-xs"
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
@@ -93,7 +93,7 @@ export function ModelMultiSelect({
             onCheckedChange={selectAll}
             onSelect={(e) => e.preventDefault()}
           >
-            All models
+            Wszystkie modele
           </DropdownMenuCheckboxItem>
           <DropdownMenuSeparator />
           {filtered.map((model) => (
@@ -107,7 +107,7 @@ export function ModelMultiSelect({
             </DropdownMenuCheckboxItem>
           ))}
           {filtered.length === 0 ? (
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">No models found</div>
+            <div className="px-2 py-1.5 text-xs text-muted-foreground">Nie znaleziono modeli</div>
           ) : null}
         </DropdownMenuContent>
       </DropdownMenu>

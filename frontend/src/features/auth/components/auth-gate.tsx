@@ -48,7 +48,7 @@ export function AuthGate({ children }: PropsWithChildren) {
             </div>
             <div>
               <h1 className="text-xl font-semibold tracking-tight">Codex LB</h1>
-              <p className="mt-0.5 text-sm text-muted-foreground">API Load Balancer</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">Równoważenie obciążenia API</p>
             </div>
           </div>
           <LoginForm />

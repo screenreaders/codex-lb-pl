@@ -1,22 +1,22 @@
 import { RESET_ERROR_LABEL } from "@/utils/constants";
 
-const numberFormatter = new Intl.NumberFormat("en-US");
-const compactFormatter = new Intl.NumberFormat("en-US", {
+const numberFormatter = new Intl.NumberFormat("pl-PL");
+const compactFormatter = new Intl.NumberFormat("pl-PL", {
   notation: "compact",
   maximumFractionDigits: 2,
 });
-const currencyFormatter = new Intl.NumberFormat("en-US", {
+const currencyFormatter = new Intl.NumberFormat("pl-PL", {
   style: "currency",
   currency: "USD",
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
-const timeFormatter = new Intl.DateTimeFormat("en-US", {
+const timeFormatter = new Intl.DateTimeFormat("pl-PL", {
   hour: "2-digit",
   minute: "2-digit",
   second: "2-digit",
 });
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
+const dateFormatter = new Intl.DateTimeFormat("pl-PL", {
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
@@ -148,17 +148,17 @@ export function formatTokensWithCached(totalTokens: unknown, cachedInputTokens: 
   if (cached === null || cached <= 0) {
     return formatCompactNumber(total);
   }
-  return `${formatCompactNumber(total)} (${formatCompactNumber(cached)} Cached)`;
+  return `${formatCompactNumber(total)} (${formatCompactNumber(cached)} z cache)`;
 }
 
 export function formatCachedTokensMeta(totalTokens: unknown, cachedInputTokens: unknown): string {
   const total = toNumber(totalTokens);
   const cached = toNumber(cachedInputTokens);
   if (total === null || total <= 0 || cached === null || cached <= 0) {
-    return "Cached: --";
+    return "Cache: --";
   }
   const percent = Math.min(100, Math.max(0, (cached / total) * 100));
-  return `Cached: ${formatCompactNumber(cached)} (${Math.round(percent)}%)`;
+  return `Cache: ${formatCompactNumber(cached)} (${Math.round(percent)}%)`;
 }
 
 export function formatModelLabel(model: string | null | undefined, reasoningEffort: string | null | undefined): string {
@@ -184,14 +184,14 @@ export function formatTimeLong(iso: string | null | undefined): FormattedDateTim
 export function formatRelative(ms: number): string {
   const minutes = Math.ceil(ms / 60_000);
   if (minutes < 60) {
-    return `in ${minutes}m`;
+    return `za ${minutes}m`;
   }
   const hours = Math.ceil(minutes / 60);
   if (hours < 24) {
-    return `in ${hours}h`;
+    return `za ${hours}h`;
   }
   const days = Math.ceil(hours / 24);
-  return `in ${days}d`;
+  return `za ${days}d`;
 }
 
 export function formatCountdown(seconds: number): string {
@@ -208,7 +208,7 @@ export function formatQuotaResetLabel(resetAt: string | null | undefined): strin
   }
   const diffMs = date.getTime() - Date.now();
   if (diffMs <= 0) {
-    return "now";
+    return "teraz";
   }
   return formatRelative(diffMs);
 }
@@ -220,9 +220,9 @@ export function formatQuotaResetMeta(
   const labelSecondary = formatQuotaResetLabel(resetAtSecondary);
   const windowSecondary = formatWindowLabel("secondary", windowMinutesSecondary);
   if (labelSecondary === RESET_ERROR_LABEL) {
-    return "Quota reset unavailable";
+    return "Reset limitu niedostępny";
   }
-  return `Quota reset (${windowSecondary}) · ${labelSecondary}`;
+  return `Reset limitu (${windowSecondary}) · ${labelSecondary}`;
 }
 
 export function truncateText(value: unknown, maxLen = 80): string {
@@ -242,36 +242,36 @@ export function truncateText(value: unknown, maxLen = 80): string {
 export function formatAccessTokenLabel(auth: AccountAuthStatus | null | undefined): string {
   const expiresAt = auth?.access?.expiresAt;
   if (!expiresAt) {
-    return "Missing";
+    return "Brak";
   }
   const expiresDate = parseDate(expiresAt);
   if (!expiresDate) {
-    return "Unknown";
+    return "Nieznany";
   }
   const diffMs = expiresDate.getTime() - Date.now();
   if (diffMs <= 0) {
-    return "Expired";
+    return "Wygasł";
   }
-  return `Valid (${formatRelative(diffMs)})`;
+  return `Ważny (${formatRelative(diffMs)})`;
 }
 
 export function formatRefreshTokenLabel(auth: AccountAuthStatus | null | undefined): string {
   const state = auth?.refresh?.state;
   const labelMap: Record<string, string> = {
-    stored: "Stored",
-    missing: "Missing",
-    expired: "Expired",
+    stored: "Zapisany",
+    missing: "Brak",
+    expired: "Wygasł",
   };
-  return state && labelMap[state] ? labelMap[state] : "Unknown";
+  return state && labelMap[state] ? labelMap[state] : "Nieznany";
 }
 
 export function formatIdTokenLabel(auth: AccountAuthStatus | null | undefined): string {
   const state = auth?.idToken?.state;
   const labelMap: Record<string, string> = {
-    parsed: "Parsed",
-    unknown: "Unknown",
+    parsed: "Przetworzony",
+    unknown: "Nieznany",
   };
-  return state && labelMap[state] ? labelMap[state] : "Unknown";
+  return state && labelMap[state] ? labelMap[state] : "Nieznany";
 }
 
 export function toModels(value: string): string[] | undefined {

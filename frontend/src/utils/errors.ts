@@ -1,11 +1,11 @@
-export function getErrorMessage(error: unknown, fallback = "Request failed"): string {
+export function getErrorMessage(error: unknown, fallback = "Żądanie nie powiodło się"): string {
   if (error instanceof Error) {
     return error.message;
   }
   return fallback;
 }
 
-export function getErrorMessageOrNull(error: unknown, fallback = "Request failed"): string | null {
+export function getErrorMessageOrNull(error: unknown, fallback = "Żądanie nie powiodło się"): string | null {
   if (!error) {
     return null;
   }

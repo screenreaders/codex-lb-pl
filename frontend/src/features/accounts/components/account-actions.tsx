@@ -31,7 +31,7 @@ export function AccountActions({
           disabled={busy}
         >
           <Play className="h-3.5 w-3.5" />
-          Resume
+          Wznów
         </Button>
       ) : (
         <Button
@@ -43,7 +43,7 @@ export function AccountActions({
           disabled={busy}
         >
           <Pause className="h-3.5 w-3.5" />
-          Pause
+          Wstrzymaj
         </Button>
       )}
 
@@ -57,7 +57,7 @@ export function AccountActions({
           disabled={busy}
         >
           <RefreshCw className="h-3.5 w-3.5" />
-          Re-authenticate
+          Uwierzytelnij ponownie
         </Button>
       ) : null}
 
@@ -70,7 +70,7 @@ export function AccountActions({
         disabled={busy}
       >
         <Trash2 className="h-3.5 w-3.5" />
-        Delete
+        Usuń
       </Button>
     </div>
   );

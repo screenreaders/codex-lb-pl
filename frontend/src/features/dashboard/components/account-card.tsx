@@ -89,7 +89,7 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold leading-tight">{heading}</p>
           {subtitle ? (
-            <p className="mt-0.5 truncate text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
+            <p className="mt-0.5 truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
               {subtitle}
             </p>
           ) : null}
@@ -99,8 +99,8 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
 
       {/* Quota bars */}
       <div className={cn("mt-3.5 grid gap-3", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
-        {!weeklyOnly && <QuotaBar label="Primary" percent={primaryRemaining} resetLabel={primaryReset} />}
-        <QuotaBar label="Secondary" percent={secondaryRemaining} resetLabel={secondaryReset} />
+        {!weeklyOnly && <QuotaBar label="Główne" percent={primaryRemaining} resetLabel={primaryReset} />}
+        <QuotaBar label="Wtórne" percent={secondaryRemaining} resetLabel={secondaryReset} />
       </div>
 
       {/* Actions */}
@@ -113,7 +113,7 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
           onClick={() => onAction?.(account, "details")}
         >
           <ExternalLink className="h-3 w-3" />
-          Details
+          Szczegóły
         </Button>
         {status === "paused" && (
           <Button
@@ -124,7 +124,7 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
             onClick={() => onAction?.(account, "resume")}
           >
             <Play className="h-3 w-3" />
-            Resume
+            Wznów
           </Button>
         )}
         {status === "deactivated" && (
@@ -136,7 +136,7 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
             onClick={() => onAction?.(account, "reauth")}
           >
             <RotateCcw className="h-3 w-3" />
-            Re-auth
+            Uwierzytelnij
           </Button>
         )}
       </div>

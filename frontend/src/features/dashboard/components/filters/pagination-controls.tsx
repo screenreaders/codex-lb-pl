@@ -34,7 +34,7 @@ export function PaginationControls({
 
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="text-muted-foreground">Rows</span>
+      <span className="text-muted-foreground">Wiersze</span>
       <Select value={String(limit)} onValueChange={(value) => onLimitChange(Number(value))}>
         <SelectTrigger size="sm" className="w-20">
           <SelectValue />
@@ -49,7 +49,7 @@ export function PaginationControls({
       </Select>
 
       <span className="tabular-nums text-muted-foreground">
-        {rangeStart}&ndash;{rangeEnd} of {total}
+        {rangeStart}&ndash;{rangeEnd} z {total}
       </span>
 
       <Button
@@ -59,7 +59,7 @@ export function PaginationControls({
         className="h-8 w-8"
         disabled={offset <= 0}
         onClick={() => onOffsetChange(0)}
-        aria-label="First page"
+        aria-label="Pierwsza strona"
       >
         <ChevronsLeft className="h-4 w-4" />
       </Button>
@@ -70,7 +70,7 @@ export function PaginationControls({
         className="h-8 w-8"
         disabled={offset <= 0}
         onClick={() => onOffsetChange(Math.max(0, offset - limit))}
-        aria-label="Previous page"
+        aria-label="Poprzednia strona"
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -81,7 +81,7 @@ export function PaginationControls({
         className="h-8 w-8"
         disabled={!hasMore}
         onClick={() => onOffsetChange(offset + limit)}
-        aria-label="Next page"
+        aria-label="Następna strona"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
@@ -92,7 +92,7 @@ export function PaginationControls({
         className="h-8 w-8"
         disabled={!hasMore}
         onClick={() => onOffsetChange(lastPage)}
-        aria-label="Last page"
+        aria-label="Ostatnia strona"
       >
         <ChevronsRight className="h-4 w-4" />
       </Button>

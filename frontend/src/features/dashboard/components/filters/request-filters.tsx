@@ -40,7 +40,7 @@ export function RequestFilters({
             value={filters.search}
             onChange={(event) => onSearchChange(event.target.value)}
             className="h-8 pl-9"
-            placeholder="Search request id, account, model, error..."
+            placeholder="Szukaj ID żądania, konta, modelu, błędu..."
           />
         </div>
 
@@ -49,19 +49,19 @@ export function RequestFilters({
 
       <div className="flex flex-wrap items-center gap-2">
         <MultiSelectFilter
-          label="Accounts"
+          label="Konta"
           values={filters.accountIds}
           options={accountOptions}
           onChange={onAccountChange}
         />
         <MultiSelectFilter
-          label="Models"
+          label="Modele"
           values={filters.modelOptions}
           options={modelOptions}
           onChange={onModelChange}
         />
         <MultiSelectFilter
-          label="Statuses"
+          label="Statusy"
           values={filters.statuses}
           options={statusOptions}
           onChange={onStatusChange}
@@ -69,7 +69,7 @@ export function RequestFilters({
 
         <Button type="button" variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 text-xs text-muted-foreground">
           <RotateCcw className="h-3 w-3" aria-hidden="true" />
-          Reset
+          Resetuj
         </Button>
       </div>
     </div>

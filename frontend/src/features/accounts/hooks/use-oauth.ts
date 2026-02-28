@@ -61,7 +61,7 @@ export function useOauth() {
         OAuthStateSchema.parse({
           ...prev,
           status: "error",
-          errorMessage: error instanceof Error ? error.message : "Failed to poll OAuth status",
+          errorMessage: error instanceof Error ? error.message : "Nie udało się sprawdzić statusu OAuth",
         }),
       );
     }
@@ -89,7 +89,7 @@ export function useOauth() {
       setState(nextState);
       return nextState;
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to start OAuth";
+      const message = error instanceof Error ? error.message : "Nie udało się rozpocząć OAuth";
       setState((prev) =>
         OAuthStateSchema.parse({
           ...prev,
@@ -118,7 +118,7 @@ export function useOauth() {
         OAuthStateSchema.parse({
           ...prev,
           status: "error",
-          errorMessage: error instanceof Error ? error.message : "Failed to complete OAuth",
+          errorMessage: error instanceof Error ? error.message : "Nie udało się zakończyć OAuth",
         }),
       );
       throw error;

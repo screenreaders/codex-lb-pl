@@ -33,14 +33,14 @@ export function UsageDonuts({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <DonutChart
-        title="Primary Remaining"
-        subtitle={`Window ${formatWindowLabel("primary", primaryWindowMinutes)}`}
+        title="Pozostało (główne)"
+        subtitle={`Okno ${formatWindowLabel("primary", primaryWindowMinutes)}`}
         items={primaryChartItems}
         total={primaryTotal}
       />
       <DonutChart
-        title="Secondary Remaining"
-        subtitle={`Window ${formatWindowLabel("secondary", secondaryWindowMinutes)}`}
+        title="Pozostało (wtórne)"
+        subtitle={`Okno ${formatWindowLabel("secondary", secondaryWindowMinutes)}`}
         items={secondaryChartItems}
         total={secondaryTotal}
       />

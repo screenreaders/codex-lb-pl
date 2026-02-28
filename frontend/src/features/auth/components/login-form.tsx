@@ -30,8 +30,8 @@ export function LoginForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="rounded-2xl border bg-card p-6 shadow-[var(--shadow-md)]">
         <div className="space-y-1.5">
-          <h2 className="text-base font-semibold tracking-tight">Sign in</h2>
-          <p className="text-sm text-muted-foreground">Enter your admin password to continue.</p>
+          <h2 className="text-base font-semibold tracking-tight">Zaloguj się</h2>
+          <p className="text-sm text-muted-foreground">Wpisz hasło administratora, aby kontynuować.</p>
         </div>
 
         <div className="mt-5">
@@ -40,7 +40,7 @@ export function LoginForm() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-xs font-medium">Password</FormLabel>
+                <FormLabel className="text-xs font-medium">Hasło</FormLabel>
                 <div className="relative">
                   <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
                   <FormControl>
@@ -48,7 +48,7 @@ export function LoginForm() {
                       {...field}
                       type="password"
                       autoComplete="current-password"
-                      placeholder="Enter password"
+                      placeholder="Wpisz hasło"
                       disabled={loading}
                       className="pl-9"
                     />
@@ -64,7 +64,7 @@ export function LoginForm() {
 
         <Button type="submit" className="press-scale mt-5 w-full" disabled={loading}>
           {loading ? <Spinner size="sm" className="mr-2" /> : null}
-          Sign In
+          Zaloguj się
         </Button>
       </form>
     </Form>

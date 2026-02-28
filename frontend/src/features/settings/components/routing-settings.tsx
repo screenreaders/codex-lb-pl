@@ -29,7 +29,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             </div>
             <div>
               <h3 className="text-sm font-semibold">Routing</h3>
-              <p className="text-xs text-muted-foreground">Control how requests are distributed across accounts.</p>
+              <p className="text-xs text-muted-foreground">Kontroluj sposób rozdzielania żądań między konta.</p>
             </div>
           </div>
         </div>
@@ -37,8 +37,8 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
         <div className="divide-y rounded-lg border">
           <div className="flex items-center justify-between p-3">
             <div>
-              <p className="text-sm font-medium">Sticky threads</p>
-              <p className="text-xs text-muted-foreground">Keep related requests on the same account.</p>
+              <p className="text-sm font-medium">Stałe przypisanie</p>
+              <p className="text-xs text-muted-foreground">Utrzymuj powiązane żądania na tym samym koncie.</p>
             </div>
             <Switch
               checked={settings.stickyThreadsEnabled}
@@ -49,8 +49,8 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
 
           <div className="flex items-center justify-between p-3">
             <div>
-              <p className="text-sm font-medium">Prefer earlier reset</p>
-              <p className="text-xs text-muted-foreground">Bias traffic to accounts with earlier quota reset.</p>
+              <p className="text-sm font-medium">Preferuj wcześniejszy reset</p>
+              <p className="text-xs text-muted-foreground">Kieruj więcej ruchu na konta z wcześniejszym resetem limitu.</p>
             </div>
             <Switch
               checked={settings.preferEarlierResetAccounts}
