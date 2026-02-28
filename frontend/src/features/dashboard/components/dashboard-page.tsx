@@ -108,9 +108,9 @@ export function DashboardPage() {
       {/* Page header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Panel</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Overview, account health, and recent request logs.
+            Przegląd, stan kont i ostatnie logi żądań.
           </p>
         </div>
         <button
@@ -118,7 +118,7 @@ export function DashboardPage() {
           onClick={handleRefresh}
           disabled={isRefreshing}
           className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-          title="Refresh dashboard"
+          title="Odśwież panel"
         >
           <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} />
         </button>
@@ -143,7 +143,7 @@ export function DashboardPage() {
 
           <section className="space-y-4">
             <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Accounts</h2>
+              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Konta</h2>
               <div className="h-px flex-1 bg-border" />
             </div>
             <AccountCards accounts={overview?.accounts ?? []} onAction={handleAccountAction} />
@@ -151,7 +151,7 @@ export function DashboardPage() {
 
           <section className="space-y-4">
             <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Request Logs</h2>
+              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Logi żądań</h2>
               <div className="h-px flex-1 bg-border" />
             </div>
             <RequestFilters

@@ -23,17 +23,23 @@ import { formatCompactNumber, formatCurrency, formatTimeLong } from "@/utils/for
 
 function formatExpiry(value: string | null): string {
   if (!value) {
-    return "Never";
+    return "Nigdy";
   }
   const parsed = formatTimeLong(value);
   return `${parsed.date} ${parsed.time}`;
 }
 
 const LIMIT_TYPE_SHORT: Record<LimitType, string> = {
-  total_tokens: "Tokens",
-  input_tokens: "Input",
-  output_tokens: "Output",
-  cost_usd: "Cost",
+  total_tokens: "Tokeny",
+  input_tokens: "Wejście",
+  output_tokens: "Wyjście",
+  cost_usd: "Koszt",
+};
+
+const LIMIT_WINDOW_SHORT: Record<string, string> = {
+  daily: "dzienny",
+  weekly: "tygodniowy",
+  monthly: "miesięczny",
 };
 
 function formatLimitSummary(limits: LimitRule[]): string {
@@ -48,7 +54,8 @@ function formatLimitSummary(limits: LimitRule[]): string {
       const max = isCost
         ? `$${(l.maxValue / 1_000_000).toFixed(2)}`
         : formatCompactNumber(l.maxValue);
-      return `${type}: ${current}/${max} ${l.limitWindow}`;
+      const windowLabel = LIMIT_WINDOW_SHORT[l.limitWindow] ?? l.limitWindow;
+      return `${type}: ${current}/${max} ${windowLabel}`;
     })
     .join(" | ");
 }
@@ -63,7 +70,7 @@ function formatUsageSummary(
   const cached = formatCompactNumber(cachedInputTokens);
   const requests = formatCompactNumber(requestCount);
   const cost = formatCurrency(totalCostUsd);
-  return `${total} tok | ${cached} cached | ${requests} req | ${cost}`;
+  return `${total} tok | ${cached} z cache | ${requests} żąd. | ${cost}`;
 }
 
 export type ApiKeyTableProps = {
@@ -76,7 +83,7 @@ export type ApiKeyTableProps = {
 
 export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiKeyTableProps) {
   if (keys.length === 0) {
-    return <EmptyState icon={KeyRound} title="No API keys created yet" />;
+    return <EmptyState icon={KeyRound} title="Nie utworzono jeszcze kluczy API" />;
   }
 
   return (
@@ -84,18 +91,18 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
     <Table className="table-fixed">
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[20%] min-w-[12rem] pl-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Name</TableHead>
-          <TableHead className="w-[10%] min-w-[8rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Prefix</TableHead>
-          <TableHead className="w-[9%] min-w-[6.5rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Models</TableHead>
-          <TableHead className="w-[40%] min-w-[24rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Usage</TableHead>
-          <TableHead className="w-[8%] min-w-[7rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Expiry</TableHead>
+          <TableHead className="w-[20%] min-w-[12rem] pl-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Nazwa</TableHead>
+          <TableHead className="w-[10%] min-w-[8rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Prefiks</TableHead>
+          <TableHead className="w-[9%] min-w-[6.5rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Modele</TableHead>
+          <TableHead className="w-[40%] min-w-[24rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Użycie</TableHead>
+          <TableHead className="w-[8%] min-w-[7rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Ważność</TableHead>
           <TableHead className="w-[7%] min-w-[5.5rem] text-[11px] uppercase tracking-wider text-muted-foreground/80">Status</TableHead>
-          <TableHead className="w-[6%] min-w-[4.5rem] pr-4 text-right text-[11px] uppercase tracking-wider text-muted-foreground/80">Actions</TableHead>
+          <TableHead className="w-[6%] min-w-[4.5rem] pr-4 text-right text-[11px] uppercase tracking-wider text-muted-foreground/80">Akcje</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {keys.map((apiKey) => {
-          const models = apiKey.allowedModels?.join(", ") || "All";
+          const models = apiKey.allowedModels?.join(", ") || "Wszystkie";
           const usageText = apiKey.limits.length > 0
             ? formatLimitSummary(apiKey.limits)
             : apiKey.usageSummary && apiKey.usageSummary.requestCount > 0
@@ -105,7 +112,7 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
                   apiKey.usageSummary.cachedInputTokens,
                   apiKey.usageSummary.totalCostUsd,
                 )
-              : "No usage";
+              : "Brak użycia";
 
           return (
             <TableRow key={apiKey.id}>
@@ -116,7 +123,7 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
               <TableCell className="truncate text-xs text-muted-foreground">{formatExpiry(apiKey.expiresAt)}</TableCell>
               <TableCell>
                 <Badge className={apiKey.isActive ? "bg-emerald-500 text-white" : "bg-zinc-500 text-white"}>
-                  {apiKey.isActive ? "Active" : "Disabled"}
+                  {apiKey.isActive ? "Aktywny" : "Wyłączony"}
                 </Badge>
               </TableCell>
               <TableCell className="pr-4 text-right">
@@ -124,22 +131,22 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
                   <DropdownMenuTrigger asChild>
                     <Button type="button" size="icon-sm" variant="ghost" disabled={busy}>
                       <Ellipsis className="size-4" />
-                      <span className="sr-only">Actions</span>
+                      <span className="sr-only">Akcje</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit(apiKey)}>
                       <Pencil className="size-4" />
-                      Edit
+                      Edytuj
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onRegenerate(apiKey)}>
                       <RefreshCw className="size-4" />
-                      Regenerate
+                      Wygeneruj ponownie
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete(apiKey)}>
                       <Trash2 className="size-4" />
-                      Delete
+                      Usuń
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

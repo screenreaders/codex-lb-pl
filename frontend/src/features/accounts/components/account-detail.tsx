@@ -37,8 +37,8 @@ export function AccountDetail({
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
           <User className="h-5 w-5 text-muted-foreground" />
         </div>
-        <p className="mt-3 text-sm font-medium text-muted-foreground">Select an account</p>
-        <p className="mt-1 text-xs text-muted-foreground/70">Choose an account from the list to view details.</p>
+        <p className="mt-3 text-sm font-medium text-muted-foreground">Wybierz konto</p>
+        <p className="mt-1 text-xs text-muted-foreground/70">Wybierz konto z listy, aby zobaczyć szczegóły.</p>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export function AccountDetail({
           {titleIsEmail ? <><span className={blurred ? "privacy-blur" : ""}>{title}</span>{idSuffix}</> : <>{title}{!emailSubtitle ? idSuffix : ""}</>}
         </h2>
         {emailSubtitle ? (
-          <p className="mt-0.5 text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
+          <p className="mt-0.5 text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
             <span className={blurred ? "privacy-blur" : ""}>{emailSubtitle}</span>{showAccountId ? ` | ID ${compactId}` : ""}
           </p>
         ) : null}

@@ -298,16 +298,16 @@ class OauthService:
         state = params.get("state")
 
         if error:
-            await self._set_error(f"OAuth error: {error}")
-            return self._html_response(_error_html("Authorization failed."))
+            await self._set_error(f"Błąd OAuth: {error}")
+            return self._html_response(_error_html("Autoryzacja nieudana."))
 
         async with self._store.lock:
             expected_state = self._store.state.state_token
             verifier = self._store.state.code_verifier
 
         if not code or not state or state != expected_state or not verifier:
-            await self._set_error("Invalid OAuth callback state.")
-            return self._html_response(_error_html("Invalid OAuth callback."))
+            await self._set_error("Nieprawidłowy stan callback OAuth.")
+            return self._html_response(_error_html("Nieprawidłowy callback OAuth."))
 
         try:
             tokens = await exchange_authorization_code(code=code, code_verifier=verifier)
@@ -336,7 +336,7 @@ class OauthService:
                     await self._set_success()
                     return
                 await _async_sleep(context.interval_seconds)
-            await self._set_error("Device code expired.")
+            await self._set_error("Kod urządzenia wygasł.")
         except OAuthError as exc:
             await self._set_error(exc.message)
         except AccountIdentityConflictError as exc:
@@ -410,8 +410,8 @@ def _success_html() -> str:
     try:
         return _SUCCESS_TEMPLATE.read_text(encoding="utf-8")
     except OSError:
-        return "<html><body><h1>Login complete</h1><p>Return to the dashboard.</p></body></html>"
+        return "<html><body><h1>Logowanie zakończone</h1><p>Wróć do panelu.</p></body></html>"
 
 
 def _error_html(message: str) -> str:
-    return f"<html><body><h1>Login failed</h1><p>{message}</p></body></html>"
+    return f"<html><body><h1>Logowanie nieudane</h1><p>{message}</p></body></html>"

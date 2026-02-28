@@ -44,12 +44,12 @@ function CopyButton({ text }: { text: string }) {
       {copied ? (
         <>
           <Check className="h-3 w-3" />
-          Copied!
+          Skopiowano!
         </>
       ) : (
         <>
           <Copy className="h-3 w-3" />
-          Copy
+          Kopiuj
         </>
       )}
     </Button>
@@ -158,10 +158,10 @@ export function OauthDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {stage === "success" ? "Account added" : stage === "error" ? "Authorization failed" : "Add account with OAuth"}
+            {stage === "success" ? "Konto dodane" : stage === "error" ? "Autoryzacja nieudana" : "Dodaj konto przez OAuth"}
           </DialogTitle>
           {stage === "intro" ? (
-            <DialogDescription>Choose a sign-in method and complete authorization.</DialogDescription>
+            <DialogDescription>Wybierz metodę logowania i dokończ autoryzację.</DialogDescription>
           ) : null}
         </DialogHeader>
 
@@ -178,9 +178,9 @@ export function OauthDialog({
                   : "hover:bg-muted/50",
               )}
             >
-              <p className="text-sm font-medium">Browser (PKCE)</p>
+              <p className="text-sm font-medium">Przeglądarka (PKCE)</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Opens a browser window for sign-in. Recommended for most users.
+                Otwiera okno przeglądarki do logowania. Polecane dla większości użytkowników.
               </p>
             </button>
             <button
@@ -193,9 +193,9 @@ export function OauthDialog({
                   : "hover:bg-muted/50",
               )}
             >
-              <p className="text-sm font-medium">Device code</p>
+              <p className="text-sm font-medium">Kod urządzenia</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Use a code on another device. Useful for headless environments.
+                Użyj kodu na innym urządzeniu. Przydatne w środowiskach bez interfejsu.
               </p>
             </button>
           </div>
@@ -206,7 +206,7 @@ export function OauthDialog({
           <div className="min-w-0 space-y-3 text-sm">
             {state.authorizationUrl ? (
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-muted-foreground">Authorization URL</p>
+                <p className="text-xs font-medium text-muted-foreground">URL autoryzacji</p>
                 <div className="flex min-w-0 items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 truncate font-mono text-xs">{state.authorizationUrl}</p>
                   <CopyButton text={state.authorizationUrl} />
@@ -216,7 +216,7 @@ export function OauthDialog({
             <ManualCallbackInput onSubmit={onManualCallback} />
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              <span>Waiting for authorization to complete...</span>
+              <span>Oczekiwanie na zakończenie autoryzacji...</span>
             </div>
           </div>
         ) : null}
@@ -225,14 +225,14 @@ export function OauthDialog({
         {stage === "device" ? (
           <div className="space-y-3 text-sm">
             <ol className="list-inside list-decimal space-y-1 text-xs text-muted-foreground">
-              <li>Open the verification link below</li>
-              <li>Enter the user code when prompted</li>
-              <li>Complete sign-in on that page</li>
+              <li>Otwórz poniższy link weryfikacyjny</li>
+              <li>Wprowadź kod użytkownika, gdy pojawi się monit</li>
+              <li>Dokończ logowanie na tej stronie</li>
             </ol>
 
             {state.userCode ? (
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-muted-foreground">User code</p>
+                <p className="text-xs font-medium text-muted-foreground">Kod użytkownika</p>
                 <div className="flex items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 font-mono text-lg font-bold tracking-widest">{state.userCode}</p>
                   <CopyButton text={state.userCode} />
@@ -242,7 +242,7 @@ export function OauthDialog({
 
             {state.verificationUrl ? (
               <div className="space-y-1.5">
-                <p className="text-xs font-medium text-muted-foreground">Verification URL</p>
+                <p className="text-xs font-medium text-muted-foreground">URL weryfikacji</p>
                 <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 truncate break-all font-mono text-xs">{state.verificationUrl}</p>
                   <CopyButton text={state.verificationUrl} />
@@ -253,9 +253,9 @@ export function OauthDialog({
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
               <span>
-                Waiting for authorization
+                Oczekiwanie na autoryzację
                 {state.expiresInSeconds != null && state.expiresInSeconds > 0
-                  ? ` · expires in ${formatCountdown(state.expiresInSeconds)}`
+                  ? ` · wygasa za ${formatCountdown(state.expiresInSeconds)}`
                   : "..."}
               </span>
             </div>
@@ -266,7 +266,7 @@ export function OauthDialog({
         {stage === "success" ? (
           <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-700 dark:text-emerald-400">
             <Check className="h-4 w-4 shrink-0" />
-            <p>Account has been added successfully.</p>
+            <p>Konto zostało pomyślnie dodane.</p>
           </div>
         ) : null}
 
@@ -274,7 +274,7 @@ export function OauthDialog({
         {stage === "error" ? (
           <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-3 text-sm text-destructive">
             <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-            <p>{state.errorMessage || "An unknown error occurred."}</p>
+            <p>{state.errorMessage || "Wystąpił nieznany błąd."}</p>
           </div>
         ) : null}
 
@@ -282,10 +282,10 @@ export function OauthDialog({
           {stage === "intro" ? (
             <>
               <Button type="button" variant="outline" onClick={() => close(false)}>
-                Cancel
+                Anuluj
               </Button>
               <Button type="button" onClick={handleStart}>
-                Start sign-in
+                Rozpocznij logowanie
               </Button>
             </>
           ) : null}
@@ -293,13 +293,13 @@ export function OauthDialog({
           {stage === "browser" ? (
             <>
               <Button type="button" variant="outline" onClick={handleChangeMethod}>
-                Change method
+                Zmień metodę
               </Button>
               {state.authorizationUrl ? (
                 <Button type="button" asChild>
                   <a href={state.authorizationUrl} target="_blank" rel="noreferrer">
                     <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                    Open sign-in page
+                    Otwórz stronę logowania
                   </a>
                 </Button>
               ) : null}
@@ -309,13 +309,13 @@ export function OauthDialog({
           {stage === "device" ? (
             <>
               <Button type="button" variant="outline" onClick={handleChangeMethod}>
-                Change method
+                Zmień metodę
               </Button>
               {state.verificationUrl ? (
                 <Button type="button" asChild>
                   <a href={state.verificationUrl} target="_blank" rel="noreferrer">
                     <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                    Open link
+                    Otwórz link
                   </a>
                 </Button>
               ) : null}
@@ -324,17 +324,17 @@ export function OauthDialog({
 
           {stage === "success" ? (
             <Button type="button" onClick={() => close(false)}>
-              Done
+              Gotowe
             </Button>
           ) : null}
 
           {stage === "error" ? (
             <>
               <Button type="button" variant="outline" onClick={handleChangeMethod}>
-                Try again
+                Spróbuj ponownie
               </Button>
               <Button type="button" onClick={() => close(false)}>
-                Close
+                Zamknij
               </Button>
             </>
           ) : null}

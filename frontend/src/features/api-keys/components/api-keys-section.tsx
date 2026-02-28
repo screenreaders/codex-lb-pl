@@ -81,12 +81,12 @@ export function ApiKeysSection({
             <KeySquare className="h-4 w-4 text-primary" aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold">API Keys</h3>
-            <p className="text-xs text-muted-foreground">Create and manage API keys for clients.</p>
+            <h3 className="text-sm font-semibold">Klucze API</h3>
+            <p className="text-xs text-muted-foreground">Twórz i zarządzaj kluczami API dla klientów.</p>
           </div>
         </div>
         <Button type="button" size="sm" className="h-8 text-xs" onClick={() => createDialog.show()} disabled={busy}>
-          Create key
+          Utwórz klucz
         </Button>
       </div>
 
@@ -133,9 +133,9 @@ export function ApiKeysSection({
 
       <ConfirmDialog
         open={deleteDialog.open}
-        title="Delete API key"
-        description="This key will stop working immediately."
-        confirmLabel="Delete"
+        title="Usuń klucz API"
+        description="Ten klucz przestanie działać natychmiast."
+        confirmLabel="Usuń"
         onOpenChange={deleteDialog.onOpenChange}
         onConfirm={() => {
           if (!deleteDialog.data) {

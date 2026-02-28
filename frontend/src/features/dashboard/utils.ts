@@ -179,15 +179,15 @@ export function buildDashboardView(
 
   const stats: DashboardStat[] = [
     {
-      label: "Requests (7d)",
+      label: "Żądania (7d)",
       value: formatCompactNumber(metrics?.requests7d ?? 0),
-      meta: `Avg/day ${formatCompactNumber(Math.round((metrics?.requests7d ?? 0) / 7))}`,
+      meta: `Śr./dzień ${formatCompactNumber(Math.round((metrics?.requests7d ?? 0) / 7))}`,
       icon: Activity,
       trend: trendPointsToValues(trends.requests),
       trendColor: TREND_COLORS[0],
     },
     {
-      label: `Tokens (${secondaryLabel})`,
+      label: `Tokeny (${secondaryLabel})`,
       value: formatCompactNumber(metrics?.tokensSecondaryWindow ?? 0),
       meta: formatCachedTokensMeta(metrics?.tokensSecondaryWindow, metrics?.cachedTokensSecondaryWindow),
       icon: Coins,
@@ -195,19 +195,19 @@ export function buildDashboardView(
       trendColor: TREND_COLORS[1],
     },
     {
-      label: "Cost (7d)",
+      label: "Koszt (7d)",
       value: formatCurrency(cost),
-      meta: `Avg/hr ${formatCurrency(avgPerHour(cost))}`,
+      meta: `Śr./godz. ${formatCurrency(avgPerHour(cost))}`,
       icon: DollarSign,
       trend: trendPointsToValues(trends.cost),
       trendColor: TREND_COLORS[2],
     },
     {
-      label: "Error rate",
+      label: "Wskaźnik błędów",
       value: formatRate(metrics?.errorRate7d ?? null),
       meta: metrics?.topError
-        ? `Top: ${metrics.topError}`
-        : `~${formatCompactNumber(Math.round((metrics?.errorRate7d ?? 0) * (metrics?.requests7d ?? 0)))} errors in 7d`,
+        ? `Najczęstszy: ${metrics.topError}`
+        : `~${formatCompactNumber(Math.round((metrics?.errorRate7d ?? 0) * (metrics?.requests7d ?? 0)))} błędów w 7d`,
       icon: AlertTriangle,
       trend: trendPointsToValues(trends.errorRate),
       trendColor: TREND_COLORS[3],

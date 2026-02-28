@@ -8,12 +8,12 @@ import { formatTimeLong } from "@/utils/formatters";
 
 function getRoutingLabel(strategy: "usage_weighted" | "round_robin", sticky: boolean, preferEarlier: boolean): string {
   if (strategy === "round_robin") {
-    return sticky ? "Round robin + Sticky threads" : "Round robin";
+    return sticky ? "Round robin + stałe przypisanie" : "Round robin";
   }
-  if (sticky && preferEarlier) return "Sticky + Early reset";
-  if (sticky) return "Sticky threads";
-  if (preferEarlier) return "Early reset preferred";
-  return "Usage weighted";
+  if (sticky && preferEarlier) return "Stałe przypisanie + preferowany wcześniejszy reset";
+  if (sticky) return "Stałe przypisanie";
+  if (preferEarlier) return "Preferuj wcześniejszy reset";
+  return "Ważone użyciem";
 }
 
 export function StatusBar() {
@@ -49,19 +49,19 @@ export function StatusBar() {
       <div className="mx-auto flex w-full max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           {isLive ? (
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Live" />
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Na żywo" />
           ) : (
             <Activity className="h-3 w-3" aria-hidden="true" />
           )}
-          <span className="font-medium">Last sync:</span> {lastSync.time}
+          <span className="font-medium">Ostatnia synchronizacja:</span> {lastSync.time}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <ArrowRightLeft className="h-3 w-3" aria-hidden="true" />
-          <span className="font-medium">Routing:</span> {routingLabel}
+          <span className="font-medium">Trasowanie:</span> {routingLabel}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Tag className="h-3 w-3" aria-hidden="true" />
-          <span className="font-medium">Version:</span> {__APP_VERSION__}
+          <span className="font-medium">Wersja:</span> {__APP_VERSION__}
         </span>
       </div>
     </footer>

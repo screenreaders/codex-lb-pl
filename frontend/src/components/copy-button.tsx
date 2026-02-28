@@ -9,24 +9,24 @@ export type CopyButtonProps = {
   label?: string;
 };
 
-export function CopyButton({ value, label = "Copy" }: CopyButtonProps) {
+export function CopyButton({ value, label = "Kopiuj" }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      toast.success("Copied to clipboard");
+      toast.success("Skopiowano do schowka");
       setTimeout(() => setCopied(false), 1200);
     } catch {
-      toast.error("Failed to copy");
+      toast.error("Nie udało się skopiować");
     }
   };
 
   return (
     <Button type="button" variant="outline" size="sm" onClick={handleCopy}>
       {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
-      {copied ? "Copied" : label}
+      {copied ? "Skopiowano" : label}
     </Button>
   );
 }

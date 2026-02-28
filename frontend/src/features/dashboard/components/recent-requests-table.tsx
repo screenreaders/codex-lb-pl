@@ -97,8 +97,8 @@ export function RecentRequestsTable({
     return (
       <EmptyState
         icon={Inbox}
-        title="No request logs"
-        description="No request logs match the current filters."
+        title="Brak logów żądań"
+        description="Żadne logi żądań nie pasują do obecnych filtrów."
       />
     );
   }
@@ -110,15 +110,15 @@ export function RecentRequestsTable({
         <Table className="min-w-[1040px] table-fixed">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="w-28 pl-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Time</TableHead>
-              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Account</TableHead>
-              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">API Key</TableHead>
+              <TableHead className="w-28 pl-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Czas</TableHead>
+              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Konto</TableHead>
+              <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Klucz API</TableHead>
               <TableHead className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Model</TableHead>
               <TableHead className="w-20 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Transport</TableHead>
               <TableHead className="w-24 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Status</TableHead>
-              <TableHead className="w-24 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Tokens</TableHead>
-              <TableHead className="w-16 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Cost</TableHead>
-              <TableHead className="w-28 pr-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Error</TableHead>
+              <TableHead className="w-24 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Tokeny</TableHead>
+              <TableHead className="w-16 text-right text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Koszt</TableHead>
+              <TableHead className="w-28 pr-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Błąd</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -153,15 +153,15 @@ export function RecentRequestsTable({
                   <TableCell className="truncate align-top">
                     <div className="leading-tight">
                       <span className="font-mono text-xs">
-                        {formatModelLabel(request.model, request.reasoningEffort, visibleServiceTier)}
-                      </span>
-                      {showRequestedTier ? (
-                        <div className="text-[11px] text-muted-foreground">
-                          Requested {request.requestedServiceTier}
-                        </div>
-                      ) : null}
-                    </div>
-                  </TableCell>
+                      {formatModelLabel(request.model, request.reasoningEffort, visibleServiceTier)}
+                    </span>
+                    {showRequestedTier ? (
+                      <div className="text-[11px] text-muted-foreground">
+                          Żądany {request.requestedServiceTier}
+                      </div>
+                    ) : null}
+                  </div>
+                </TableCell>
                   <TableCell className="align-top">
                     {request.transport ? (
                       <Badge
@@ -183,14 +183,14 @@ export function RecentRequestsTable({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right align-top font-mono text-xs tabular-nums">
-                    <div className="leading-tight">
-                      <div>{formatCompactNumber(request.tokens)}</div>
-                      {request.cachedInputTokens != null && request.cachedInputTokens > 0 && (
-                        <div className="text-[11px] text-muted-foreground">
-                          {formatCompactNumber(request.cachedInputTokens)} Cached
-                        </div>
-                      )}
-                    </div>
+                      <div className="leading-tight">
+                        <div>{formatCompactNumber(request.tokens)}</div>
+                        {request.cachedInputTokens != null && request.cachedInputTokens > 0 && (
+                          <div className="text-[11px] text-muted-foreground">
+                          {formatCompactNumber(request.cachedInputTokens)} z cache
+                          </div>
+                        )}
+                      </div>
                   </TableCell>
                   <TableCell className="text-right align-top font-mono text-xs tabular-nums">
                     {formatCurrency(request.costUsd)}
@@ -208,7 +208,7 @@ export function RecentRequestsTable({
                           className="h-5 shrink-0 px-1.5 text-[11px]"
                           onClick={() => setViewingError(errorMessage)}
                         >
-                          View
+                          Pokaż
                         </Button>
                       ) : null}
                     </div>
@@ -235,8 +235,8 @@ export function RecentRequestsTable({
       <Dialog open={viewingError !== null} onOpenChange={(open) => { if (!open) setViewingError(null); }}>
         <DialogContent className="max-h-[80vh] sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Error Detail</DialogTitle>
-            <DialogDescription>Full error message from the request.</DialogDescription>
+            <DialogTitle>Szczegóły błędu</DialogTitle>
+            <DialogDescription>Pełna wiadomość błędu z żądania.</DialogDescription>
           </DialogHeader>
           <div className="max-h-[50vh] overflow-y-auto rounded-md bg-muted/50 p-3">
             <p className="whitespace-pre-wrap break-words font-mono text-xs leading-relaxed">

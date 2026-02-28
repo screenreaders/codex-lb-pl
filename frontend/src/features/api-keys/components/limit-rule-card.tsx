@@ -19,16 +19,16 @@ import {
 } from "@/features/api-keys/schemas";
 
 const LIMIT_TYPE_LABELS: Record<LimitType, string> = {
-  total_tokens: "Total Tokens",
-  input_tokens: "Input Tokens",
-  output_tokens: "Output Tokens",
-  cost_usd: "Cost ($)",
+  total_tokens: "Łączne tokeny",
+  input_tokens: "Tokeny wejściowe",
+  output_tokens: "Tokeny wyjściowe",
+  cost_usd: "Koszt ($)",
 };
 
 const WINDOW_LABELS: Record<LimitWindowType, string> = {
-  daily: "Daily",
-  weekly: "Weekly",
-  monthly: "Monthly",
+  daily: "Dzienny",
+  weekly: "Tygodniowy",
+  monthly: "Miesięczny",
 };
 
 const LIMIT_TYPE_SET: ReadonlySet<string> = new Set(LIMIT_TYPES);
@@ -91,7 +91,7 @@ export function LimitRuleCard({ rule, onChange, onRemove }: LimitRuleCardProps) 
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-muted-foreground">Limit rule</span>
+        <span className="text-xs font-medium text-muted-foreground">Reguła limitu</span>
         <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
           <Trash2 className="size-3.5" />
         </Button>
@@ -99,7 +99,7 @@ export function LimitRuleCard({ rule, onChange, onRemove }: LimitRuleCardProps) 
 
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-xs text-muted-foreground">Type</label>
+          <label className="text-xs text-muted-foreground">Typ</label>
           <Select value={rule.limitType} onValueChange={handleLimitTypeChange}>
             <SelectTrigger className="h-8 text-xs">
               <SelectValue />
@@ -115,7 +115,7 @@ export function LimitRuleCard({ rule, onChange, onRemove }: LimitRuleCardProps) 
         </div>
 
         <div>
-          <label className="text-xs text-muted-foreground">Window</label>
+          <label className="text-xs text-muted-foreground">Okno</label>
           <Select value={rule.limitWindow} onValueChange={handleWindowChange}>
             <SelectTrigger className="h-8 text-xs">
               <SelectValue />
@@ -133,7 +133,7 @@ export function LimitRuleCard({ rule, onChange, onRemove }: LimitRuleCardProps) 
 
       <div>
         <label className="text-xs text-muted-foreground">
-          {isCost ? "Max value (USD)" : "Max value (tokens)"}
+          {isCost ? "Maksymalna wartość (USD)" : "Maksymalna wartość (tokeny)"}
         </label>
         <Input
           type="number"
@@ -146,11 +146,11 @@ export function LimitRuleCard({ rule, onChange, onRemove }: LimitRuleCardProps) 
       </div>
 
       <div>
-        <label className="text-xs text-muted-foreground">Model filter</label>
+        <label className="text-xs text-muted-foreground">Filtr modelu</label>
         <ModelMultiSelect
           value={modelFilterArray}
           onChange={(models) => onChange({ ...rule, modelFilter: models[0] || null })}
-          placeholder="All models"
+          placeholder="Wszystkie modele"
         />
       </div>
     </div>

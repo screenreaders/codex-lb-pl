@@ -31,7 +31,7 @@ function QuotaRow({
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
-        <span className="font-medium">{label} remaining</span>
+        <span className="font-medium">Pozostało ({label})</span>
         <span
           className={cn(
             "tabular-nums font-medium",
@@ -79,9 +79,9 @@ function formatAdditionalLimitName(limitName: string, quotaKey?: string | null):
 function formatResetCountdown(resetAt: number | null): string | null {
   if (resetAt === null) return null;
   const diffMs = resetAt * 1000 - Date.now();
-  if (diffMs <= 0) return "Resetting...";
-  if (diffMs >= 3600000) return `Resets in ${Math.floor(diffMs / 3600000)}h ${Math.floor((diffMs % 3600000) / 60000)}m`;
-  return `Resets in ${Math.floor(diffMs / 60000)}m`;
+  if (diffMs <= 0) return "Resetowanie...";
+  if (diffMs >= 3600000) return `Reset za ${Math.floor(diffMs / 3600000)}h ${Math.floor((diffMs % 3600000) / 60000)}m`;
+  return `Reset za ${Math.floor(diffMs / 60000)}m`;
 }
 
 function AdditionalQuotaRow({
@@ -100,7 +100,7 @@ function AdditionalQuotaRow({
     <div className="space-y-1.5">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">{label}</span>
-        <span className="tabular-nums font-medium">{Math.round(usedPercent)}% used</span>
+        <span className="tabular-nums font-medium">{Math.round(usedPercent)}% wykorzystano</span>
       </div>
       <div className="h-1.5 rounded-full bg-muted">
         <div
@@ -132,27 +132,25 @@ export function AccountUsagePanel({ account, trends }: AccountUsagePanelProps) {
 
   return (
     <div className="space-y-4 rounded-lg border bg-muted/30 p-4">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Usage</h3>
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Użycie</h3>
       <div className={cn("grid gap-4", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
         {!weeklyOnly && <QuotaRow label="5h" percent={primary} resetAt={account.resetAtPrimary} />}
-        <QuotaRow label="Weekly" percent={secondary} resetAt={account.resetAtSecondary} />
+        <QuotaRow label="Tygodniowe" percent={secondary} resetAt={account.resetAtSecondary} />
       </div>
       <div className="rounded-md border bg-background/60 px-3 py-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Request logs total</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Suma logów zapytań</p>
         {hasRequestUsage ? (
           <p className="mt-1 text-xs tabular-nums text-muted-foreground">
-            {formatCompactNumber(requestUsage?.totalTokens)} tok | {formatCompactNumber(requestUsage?.cachedInputTokens)} cached |{" "}
-            {formatCompactNumber(requestUsage?.requestCount)} req | {formatCurrency(requestUsage?.totalCostUsd)}
+            {formatCompactNumber(requestUsage?.totalTokens)} tok | {formatCompactNumber(requestUsage?.cachedInputTokens)} z cache |{" "}
+            {formatCompactNumber(requestUsage?.requestCount)} żąd. | {formatCurrency(requestUsage?.totalCostUsd)}
           </p>
         ) : (
-          <p className="mt-1 text-xs text-muted-foreground">No request usage yet.</p>
+          <p className="mt-1 text-xs text-muted-foreground">Brak danych o użyciu zapytań.</p>
         )}
       </div>
       {account.additionalQuotas.length > 0 ? (
         <div className="space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Additional Quotas
-          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Dodatkowe limity</p>
           {account.additionalQuotas.map((quota) => (
             <div key={quota.quotaKey ?? quota.limitName} className="rounded-md border bg-background/60 px-3 py-2 space-y-2">
               <p className="text-xs font-medium">
@@ -179,7 +177,7 @@ export function AccountUsagePanel({ account, trends }: AccountUsagePanelProps) {
       {hasTrends && (
         <div className="pt-3">
           <div className="mb-2 flex items-center justify-between">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">7-day trend</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Trend 7-dniowy</h4>
             <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
@@ -187,7 +185,7 @@ export function AccountUsagePanel({ account, trends }: AccountUsagePanelProps) {
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
-                Weekly
+                Tygodniowe
               </span>
             </div>
           </div>

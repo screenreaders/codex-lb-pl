@@ -72,7 +72,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
     try {
       await setupPassword(values);
       await refreshSession();
-      toast.success("Password configured");
+      toast.success("Hasło skonfigurowane");
       closeDialog();
     } catch (caught) {
       setError(getErrorMessage(caught));
@@ -83,7 +83,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
     setError(null);
     try {
       await changePassword(values);
-      toast.success("Password changed");
+      toast.success("Hasło zmienione");
       closeDialog();
     } catch (caught) {
       setError(getErrorMessage(caught));
@@ -95,7 +95,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
     try {
       await removePassword(values);
       await refreshSession();
-      toast.success("Password removed");
+      toast.success("Hasło usunięte");
       closeDialog();
     } catch (caught) {
       setError(getErrorMessage(caught));
@@ -111,9 +111,9 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
             <KeyRound className="h-4 w-4 text-primary" aria-hidden="true" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold">Password</h3>
+            <h3 className="text-sm font-semibold">Hasło</h3>
             <p className="text-xs text-muted-foreground">
-              {passwordRequired ? "Password is configured." : "No password set."}
+              {passwordRequired ? "Hasło jest skonfigurowane." : "Hasło nie jest ustawione."}
             </p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 disabled={lock}
                 onClick={() => setActiveDialog("change")}
               >
-                Change
+                Zmień
               </Button>
               <Button
                 type="button"
@@ -139,7 +139,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 disabled={lock}
                 onClick={() => setActiveDialog("remove")}
               >
-                Remove
+                Usuń
               </Button>
             </>
           ) : (
@@ -150,7 +150,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
               disabled={lock}
               onClick={() => setActiveDialog("setup")}
             >
-              Set password
+              Ustaw hasło
             </Button>
           )}
         </div>
@@ -161,8 +161,8 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
       <Dialog open={activeDialog === "setup"} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Set password</DialogTitle>
-            <DialogDescription>Set a password for dashboard login.</DialogDescription>
+            <DialogTitle>Ustaw hasło</DialogTitle>
+            <DialogDescription>Ustaw hasło do logowania do panelu.</DialogDescription>
           </DialogHeader>
           {error ? <AlertMessage variant="error">{error}</AlertMessage> : null}
           <Form {...setupForm}>
@@ -172,9 +172,9 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 characters" />
+                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 znaków" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -182,10 +182,10 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={closeDialog} disabled={busy}>
-                  Cancel
+                  Anuluj
                 </Button>
                 <Button type="submit" disabled={lock}>
-                  Set password
+                  Ustaw hasło
                 </Button>
               </DialogFooter>
             </form>
@@ -197,8 +197,8 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
       <Dialog open={activeDialog === "change"} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Change password</DialogTitle>
-            <DialogDescription>Enter your current password and a new one.</DialogDescription>
+            <DialogTitle>Zmień hasło</DialogTitle>
+            <DialogDescription>Wpisz obecne hasło i nowe hasło.</DialogDescription>
           </DialogHeader>
           {error ? <AlertMessage variant="error">{error}</AlertMessage> : null}
           <Form {...changeForm}>
@@ -208,7 +208,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 name="currentPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current password</FormLabel>
+                    <FormLabel>Obecne hasło</FormLabel>
                     <FormControl>
                       <Input {...field} type="password" autoComplete="current-password" />
                     </FormControl>
@@ -221,9 +221,9 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 name="newPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>New password</FormLabel>
+                    <FormLabel>Nowe hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 characters" />
+                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 znaków" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -231,10 +231,10 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={closeDialog} disabled={busy}>
-                  Cancel
+                  Anuluj
                 </Button>
                 <Button type="submit" disabled={lock}>
-                  Change password
+                  Zmień hasło
                 </Button>
               </DialogFooter>
             </form>
@@ -246,8 +246,8 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
       <Dialog open={activeDialog === "remove"} onOpenChange={(open) => !open && closeDialog()}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Remove password</DialogTitle>
-            <DialogDescription>Confirm your current password to remove it.</DialogDescription>
+            <DialogTitle>Usuń hasło</DialogTitle>
+            <DialogDescription>Potwierdź obecne hasło, aby je usunąć.</DialogDescription>
           </DialogHeader>
           {error ? <AlertMessage variant="error">{error}</AlertMessage> : null}
           <Form {...removeForm}>
@@ -257,9 +257,9 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current password</FormLabel>
+                    <FormLabel>Obecne hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="current-password" placeholder="Enter current password" />
+                      <Input {...field} type="password" autoComplete="current-password" placeholder="Wpisz obecne hasło" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,10 +267,10 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
               />
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={closeDialog} disabled={busy}>
-                  Cancel
+                  Anuluj
                 </Button>
                 <Button type="submit" variant="destructive" disabled={lock}>
-                  Remove password
+                  Usuń hasło
                 </Button>
               </DialogFooter>
             </form>

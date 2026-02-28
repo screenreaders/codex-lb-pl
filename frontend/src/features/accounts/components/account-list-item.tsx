@@ -58,8 +58,10 @@ export function AccountListItem({ account, selected, showAccountId = false, onSe
           <p className="truncate text-sm font-medium">
             {titleIsEmail && blurred ? <span className="privacy-blur">{title}</span> : title}
           </p>
-          <p className="truncate text-xs text-muted-foreground" title={showAccountId ? `Account ID ${account.accountId}` : undefined}>
-            {emailSubtitle ? <><span className={blurred ? "privacy-blur" : undefined}>{emailSubtitle}</span>{idSuffix}</> : <>{baseSubtitle}{idSuffix}</>}
+          <p className="truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
+            {emailSubtitle
+              ? <><span className={blurred ? "privacy-blur" : undefined}>{emailSubtitle}</span>{idSuffix}</>
+              : <>{baseSubtitle}{idSuffix}</>}
           </p>
         </div>
         <StatusBadge status={status} />

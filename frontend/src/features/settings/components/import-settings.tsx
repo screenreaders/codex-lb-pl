@@ -24,16 +24,16 @@ export function ImportSettings({ settings, busy, onSave }: ImportSettingsProps) 
             </div>
             <div>
               <h3 className="text-sm font-semibold">Import</h3>
-              <p className="text-xs text-muted-foreground">Control how account import handles duplicates.</p>
+              <p className="text-xs text-muted-foreground">Kontroluj sposób obsługi duplikatów podczas importu kont.</p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between rounded-lg border p-3">
           <div>
-            <p className="text-sm font-medium">Allow import without overwrite</p>
+            <p className="text-sm font-medium">Zezwól na import bez nadpisywania</p>
             <p className="text-xs text-muted-foreground">
-              Keep duplicate imports as separate accounts instead of replacing existing ones.
+              Zachowuj duplikaty importu jako osobne konta zamiast zastępować istniejące.
             </p>
           </div>
           <Switch
