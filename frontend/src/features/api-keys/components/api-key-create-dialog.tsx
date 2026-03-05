@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,6 +41,9 @@ export function ApiKeyCreateDialog({ open, busy, onOpenChange, onSubmit }: ApiKe
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [limitRules, setLimitRules] = useState<LimitRuleCreate[]>([]);
   const [expiresAt, setExpiresAt] = useState<Date | null>(null);
+  const modelsLabelId = useId();
+  const expiryLabelId = useId();
+  const limitsLabelId = useId();
 
   const handleSubmit = async (values: FormValues) => {
     const validLimits = limitRules.filter((r) => r.maxValue > 0);
@@ -88,20 +91,20 @@ export function ApiKeyCreateDialog({ open, busy, onOpenChange, onSubmit }: ApiKe
                 />
 
                 <div className="space-y-1">
-                  <label className="text-sm font-medium">Dozwolone modele</label>
-                  <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} />
+                  <p id={modelsLabelId} className="text-sm font-medium">Dozwolone modele</p>
+                  <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} ariaLabel="Dozwolone modele" />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-medium">Ważność</label>
-                  <ExpiryPicker value={expiresAt} onChange={setExpiresAt} />
+                  <p id={expiryLabelId} className="text-sm font-medium">Ważność</p>
+                  <ExpiryPicker value={expiresAt} onChange={setExpiresAt} ariaLabel="Ważność klucza API" />
                 </div>
               </div>
 
               {/* Right column — Limits */}
               <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2 max-sm:mt-3 max-sm:border-t max-sm:pt-3">
-                <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limity</h4>
-                <LimitRulesEditor rules={limitRules} onChange={setLimitRules} />
+                <h4 id={limitsLabelId} className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limity</h4>
+                <LimitRulesEditor rules={limitRules} onChange={setLimitRules} ariaLabel="Edytor limitów klucza API" />
               </div>
             </div>
 

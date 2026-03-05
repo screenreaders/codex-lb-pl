@@ -43,6 +43,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             <Switch
               checked={settings.stickyThreadsEnabled}
               disabled={busy}
+              aria-label="Stałe przypisanie"
               onCheckedChange={(checked) => save({ stickyThreadsEnabled: checked })}
             />
           </div>
@@ -55,6 +56,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
             <Switch
               checked={settings.preferEarlierResetAccounts}
               disabled={busy}
+              aria-label="Preferuj wcześniejszy reset"
               onCheckedChange={(checked) => save({ preferEarlierResetAccounts: checked })}
             />
           </div>

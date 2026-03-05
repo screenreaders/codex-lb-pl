@@ -15,7 +15,12 @@ export function ApiKeyAuthToggle({ enabled, disabled = false, onChange }: ApiKey
           Wymagaj kluczy API dla przychodzących żądań `/v1/*`.
         </p>
       </div>
-      <Switch checked={enabled} disabled={disabled} onCheckedChange={onChange} />
+      <Switch
+        checked={enabled}
+        disabled={disabled}
+        onCheckedChange={onChange}
+        aria-label="Uwierzytelnianie kluczem API"
+      />
     </div>
   );
 }

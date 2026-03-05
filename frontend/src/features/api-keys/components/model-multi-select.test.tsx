@@ -13,7 +13,7 @@ describe("ModelMultiSelect", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("All models")).toBeInTheDocument();
+      expect(screen.getByText("Wszystkie modele")).toBeInTheDocument();
     });
   });
 
@@ -33,7 +33,7 @@ describe("ModelMultiSelect", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("1 model selected")).toBeInTheDocument();
+      expect(screen.getByText("Wybrano modeli: 1")).toBeInTheDocument();
     });
   });
 
@@ -43,7 +43,7 @@ describe("ModelMultiSelect", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("2 models selected")).toBeInTheDocument();
+      expect(screen.getByText("Wybrano modeli: 2")).toBeInTheDocument();
     });
   });
 
@@ -63,10 +63,10 @@ describe("ModelMultiSelect", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("All models")).toBeInTheDocument();
+      expect(screen.getByText("Wszystkie modele")).toBeInTheDocument();
     });
     // No badge X buttons should be present
-    expect(screen.queryByRole("button", { name: /×/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Usuń model/i })).not.toBeInTheDocument();
   });
 
   it("removes model via badge button", async () => {

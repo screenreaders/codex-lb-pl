@@ -42,7 +42,7 @@ const errorState = {
 };
 
 describe("OauthDialog", () => {
-  it("renders intro stage with method selection and starts flow", async () => {
+  it("renders intro stage with accessible method selection and starts flow", async () => {
     const user = userEvent.setup();
     const onStart = vi.fn().mockResolvedValue(undefined);
 
@@ -57,16 +57,21 @@ describe("OauthDialog", () => {
       />,
     );
 
-    expect(screen.getByText("Browser (PKCE)")).toBeInTheDocument();
-    expect(screen.getByText("Device code")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Start sign-in" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+    expect(screen.getByText("Krok 1 z 3")).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Metoda logowania" })).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Przeglądarka \(PKCE\)/ })).toBeChecked();
+    expect(screen.getByRole("radio", { name: /Kod urządzenia/ })).not.toBeChecked();
+    expect(screen.getByRole("button", { name: "Rozpocznij logowanie" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Anuluj" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Start sign-in" }));
-    expect(onStart).toHaveBeenCalledWith("browser");
+    await user.click(screen.getByRole("radio", { name: /Kod urządzenia/ }));
+    expect(screen.getByRole("radio", { name: /Kod urządzenia/ })).toBeChecked();
+
+    await user.click(screen.getByRole("button", { name: "Rozpocznij logowanie" }));
+    expect(onStart).toHaveBeenCalledWith("device");
   });
 
-  it("renders device stage with user code and verification URL", () => {
+  it("renders device stage with user code, verification URL, and live status", () => {
     render(
       <OauthDialog
         open
@@ -78,10 +83,13 @@ describe("OauthDialog", () => {
       />,
     );
 
+    expect(screen.getByText("Krok 2 z 3")).toBeInTheDocument();
     expect(screen.getByText("AAAA-BBBB")).toBeInTheDocument();
     expect(screen.getByText("https://auth.example.com/device")).toBeInTheDocument();
-    expect(screen.getByText(/Waiting for authorization/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Change method" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Oczekiwanie na autoryzację");
+    expect(screen.getByRole("button", { name: "Zmień metodę" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Skopiuj kod użytkownika" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Skopiuj URL weryfikacji" })).toBeInTheDocument();
   });
 
   it("renders success stage", () => {
@@ -96,8 +104,9 @@ describe("OauthDialog", () => {
       />,
     );
 
-    expect(screen.getByText("Account has been added successfully.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Done" })).toBeInTheDocument();
+    expect(screen.getByText("Krok 3 z 3")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Konto zostało pomyślnie dodane.");
+    expect(screen.getByRole("button", { name: "Gotowe" })).toBeInTheDocument();
   });
 
   it("renders error stage with message and retry option", () => {
@@ -112,10 +121,9 @@ describe("OauthDialog", () => {
       />,
     );
 
-    expect(screen.getByText("OAuth failed unexpectedly")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
-    // Dialog footer has both "Try again" and "Close" buttons (plus the dialog's X close button)
-    const closeButtons = screen.getAllByRole("button", { name: "Close" });
+    expect(screen.getByRole("alert")).toHaveTextContent("OAuth failed unexpectedly");
+    expect(screen.getByRole("button", { name: "Spróbuj ponownie" })).toBeInTheDocument();
+    const closeButtons = screen.getAllByRole("button", { name: "Zamknij" });
     expect(closeButtons.length).toBeGreaterThanOrEqual(1);
   });
 });

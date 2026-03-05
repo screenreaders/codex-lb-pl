@@ -18,9 +18,10 @@ const PRESETS = [
 export type ExpiryPickerProps = {
   value: Date | null;
   onChange: (date: Date | null) => void;
+  ariaLabel?: string;
 };
 
-export function ExpiryPicker({ value, onChange }: ExpiryPickerProps) {
+export function ExpiryPicker({ value, onChange, ariaLabel = "Ważność klucza API" }: ExpiryPickerProps) {
   const [open, setOpen] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
 
@@ -71,12 +72,13 @@ export function ExpiryPicker({ value, onChange }: ExpiryPickerProps) {
             "w-full justify-between font-normal",
             !value && "text-muted-foreground",
           )}
+          aria-label={ariaLabel}
         >
           <span className="flex items-center gap-2">
-            {value ? <CalendarIcon className="size-4" /> : <InfinityIcon className="size-4" />}
+            {value ? <CalendarIcon className="size-4" aria-hidden="true" /> : <InfinityIcon className="size-4" aria-hidden="true" />}
             {getTriggerLabel()}
           </span>
-          <ChevronDown className="size-4 opacity-50" />
+          <ChevronDown className="size-4 opacity-50" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
 
@@ -106,7 +108,7 @@ export function ExpiryPicker({ value, onChange }: ExpiryPickerProps) {
               active={value === null}
               onClick={handleNever}
             >
-              <InfinityIcon className="size-4" />
+              <InfinityIcon className="size-4" aria-hidden="true" />
               Bez wygaśnięcia
             </OptionItem>
 
@@ -131,7 +133,7 @@ export function ExpiryPicker({ value, onChange }: ExpiryPickerProps) {
               active={value !== null && activePresetDays === null}
               onClick={() => setShowCalendar(true)}
             >
-              <CalendarIcon className="size-4" />
+              <CalendarIcon className="size-4" aria-hidden="true" />
               Data niestandardowa...
               {value && activePresetDays === null && (
                 <span className="ml-auto text-xs text-muted-foreground">
@@ -158,6 +160,7 @@ function OptionItem({
   return (
     <button
       type="button"
+      aria-pressed={active}
       className={cn(
         "flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none transition-colors hover:bg-accent hover:text-accent-foreground",
         active && "bg-accent text-accent-foreground font-medium",

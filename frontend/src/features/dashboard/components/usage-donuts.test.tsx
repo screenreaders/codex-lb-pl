@@ -32,8 +32,8 @@ describe("UsageDonuts", () => {
       />,
     );
 
-    expect(screen.getByText("Primary Remaining")).toBeInTheDocument();
-    expect(screen.getByText("Secondary Remaining")).toBeInTheDocument();
+    expect(screen.getByText("Pozostało (główne)")).toBeInTheDocument();
+    expect(screen.getByText("Pozostało (wtórne)")).toBeInTheDocument();
     expect(screen.getByText("primary@example.com")).toBeInTheDocument();
     expect(screen.getByText("secondary@example.com")).toBeInTheDocument();
   });
@@ -50,8 +50,8 @@ describe("UsageDonuts", () => {
       />,
     );
 
-    expect(screen.getByText("Primary Remaining")).toBeInTheDocument();
-    expect(screen.getByText("Secondary Remaining")).toBeInTheDocument();
-    expect(screen.getAllByText("Remaining").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Pozostało (główne)")).toBeInTheDocument();
+    expect(screen.getByText("Pozostało (wtórne)")).toBeInTheDocument();
+    expect(screen.getAllByText(/Pozostało/).length).toBeGreaterThanOrEqual(2);
   });
 });

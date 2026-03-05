@@ -40,7 +40,7 @@ describe("AuthGate", () => {
       </AuthGate>,
     );
 
-    expect(screen.getByText("Sign in")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Zaloguj się" })).toBeInTheDocument();
     expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
     await waitFor(() => expect(refreshSession).toHaveBeenCalledTimes(1));
   });
@@ -79,8 +79,8 @@ describe("AuthGate", () => {
       </AuthGate>,
     );
 
-    expect(screen.getByText("Two-factor verification")).toBeInTheDocument();
-    expect(screen.queryByText("Dashboard Login")).not.toBeInTheDocument();
+    expect(screen.getByText("Weryfikacja dwuetapowa")).toBeInTheDocument();
+    expect(screen.queryByText("Zaloguj się")).not.toBeInTheDocument();
     await waitFor(() => expect(refreshSession).toHaveBeenCalledTimes(1));
   });
 });

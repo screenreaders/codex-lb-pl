@@ -111,10 +111,11 @@ export function DashboardPage() {
           type="button"
           onClick={handleRefresh}
           disabled={isRefreshing}
+          aria-label="Odśwież panel"
           className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
           title="Odśwież panel"
         >
-          <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} />
+          <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} aria-hidden="true" />
         </button>
       </div>
 

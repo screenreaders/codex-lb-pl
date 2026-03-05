@@ -11,8 +11,8 @@ describe("LimitRulesEditor", () => {
   it("renders basic mode when rules are empty", () => {
     renderWithProviders(<LimitRulesEditor rules={[]} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Weekly token limit")).toBeInTheDocument();
-    expect(screen.getByText("Weekly cost limit ($)")).toBeInTheDocument();
+    expect(screen.getByText("Tygodniowy limit tokenów")).toBeInTheDocument();
+    expect(screen.getByText("Tygodniowy limit kosztu ($)")).toBeInTheDocument();
   });
 
   it("renders basic mode for standard weekly rules", () => {
@@ -21,7 +21,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Weekly token limit")).toBeInTheDocument();
+    expect(screen.getByText("Tygodniowy limit tokenów")).toBeInTheDocument();
     expect(screen.getByDisplayValue("500000")).toBeInTheDocument();
   });
 
@@ -31,7 +31,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Add limit rule")).toBeInTheDocument();
+    expect(screen.getByText("Dodaj regułę limitu")).toBeInTheDocument();
   });
 
   it("starts in advanced mode when rules have non-weekly windows", () => {
@@ -40,7 +40,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Add limit rule")).toBeInTheDocument();
+    expect(screen.getByText("Dodaj regułę limitu")).toBeInTheDocument();
   });
 
   it("starts in advanced mode when rules have model filters", () => {
@@ -49,7 +49,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Add limit rule")).toBeInTheDocument();
+    expect(screen.getByText("Dodaj regułę limitu")).toBeInTheDocument();
   });
 
   it("adds a new rule in advanced mode", async () => {
@@ -60,7 +60,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={onChange} />);
 
-    await user.click(screen.getByText("Add limit rule"));
+    await user.click(screen.getByText("Dodaj regułę limitu"));
 
     expect(onChange).toHaveBeenCalledWith([
       rules[0],
@@ -75,7 +75,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.getByText(/All rules are applied together/)).toBeInTheDocument();
+    expect(screen.getByText(/Wszystkie reguły są stosowane łącznie/)).toBeInTheDocument();
   });
 
   it("does not show multi-rule warning with single rule", () => {
@@ -84,7 +84,7 @@ describe("LimitRulesEditor", () => {
     ];
     renderWithProviders(<LimitRulesEditor rules={rules} onChange={vi.fn()} />);
 
-    expect(screen.queryByText(/All rules are applied together/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Wszystkie reguły są stosowane łącznie/)).not.toBeInTheDocument();
   });
 
   it("handles basic token input change via fireEvent", () => {
@@ -143,11 +143,11 @@ describe("LimitRulesEditor", () => {
     const user = userEvent.setup();
     renderWithProviders(<LimitRulesEditor rules={[]} onChange={vi.fn()} />);
 
-    expect(screen.getByText("Weekly token limit")).toBeInTheDocument();
+    expect(screen.getByText("Tygodniowy limit tokenów")).toBeInTheDocument();
 
     const advancedSwitch = screen.getByRole("switch");
     await user.click(advancedSwitch);
 
-    expect(screen.getByText("Add limit rule")).toBeInTheDocument();
+    expect(screen.getByText("Dodaj regułę limitu")).toBeInTheDocument();
   });
 });

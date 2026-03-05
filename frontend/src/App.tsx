@@ -1,5 +1,5 @@
-import { lazy, Suspense } from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { lazy, Suspense, useEffect, useMemo, useRef } from "react";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { StatusBar } from "@/components/layout/status-bar";
@@ -31,18 +31,51 @@ function RouteLoadingFallback() {
 }
 
 function AppLayout() {
+  const location = useLocation();
   const logout = useAuthStore((state) => state.logout);
   const passwordRequired = useAuthStore((state) => state.passwordRequired);
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  const routeAnnouncement = useMemo(() => {
+    switch (location.pathname) {
+      case "/dashboard":
+        return "Przejście do strony: Panel";
+      case "/accounts":
+        return "Przejście do strony: Konta";
+      case "/settings":
+        return "Przejście do strony: Ustawienia";
+      default:
+        return "Przejście do strony";
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    mainRef.current?.focus();
+  }, [location.pathname]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background pb-10">
+      <a
+        href="#main-content"
+        className="sr-only z-50 rounded-md bg-background px-3 py-2 text-sm font-medium shadow-md focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+      >
+        Przejdź do treści
+      </a>
+      <p key={location.pathname} className="sr-only" aria-live="polite" aria-atomic="true">
+        {routeAnnouncement}
+      </p>
       <AppHeader
         onLogout={() => {
           void logout();
         }}
         showLogout={passwordRequired}
       />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
+      <main
+        id="main-content"
+        ref={mainRef}
+        tabIndex={-1}
+        className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 focus:outline-none sm:px-6"
+      >
         <Outlet />
       </main>
       <StatusBar />

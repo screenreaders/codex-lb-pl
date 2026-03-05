@@ -45,7 +45,7 @@ export function AppHeader({
         </div>
 
         {/* Desktop nav pills */}
-        <nav className="hidden items-center rounded-lg border border-border/50 bg-muted/40 p-0.5 sm:flex">
+        <nav aria-label="Główna nawigacja" className="hidden items-center rounded-lg border border-border/50 bg-muted/40 p-0.5 sm:flex">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.to} to={item.to}>
               {({ isActive }) => (
@@ -82,8 +82,16 @@ export function AppHeader({
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button type="button" size="icon" variant="ghost" aria-label="Otwórz menu" className="h-8 w-8 rounded-lg sm:hidden">
-                <Menu className="h-4 w-4" />
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label={mobileOpen ? "Zamknij menu" : "Otwórz menu"}
+                aria-expanded={mobileOpen}
+                aria-controls="app-mobile-nav"
+                className="h-8 w-8 rounded-lg sm:hidden"
+              >
+                <Menu className="h-4 w-4" aria-hidden="true" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72">
@@ -95,7 +103,7 @@ export function AppHeader({
                   <span className="text-sm font-semibold">Codex LB</span>
                 </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-0.5 px-4 pt-2">
+              <nav id="app-mobile-nav" aria-label="Menu mobilne" className="flex flex-col gap-0.5 px-4 pt-2">
                 {NAV_ITEMS.map((item) => (
                   <NavLink key={item.to} to={item.to} onClick={() => setMobileOpen(false)}>
                     {({ isActive }) => (

@@ -17,10 +17,10 @@ describe("PaginationControls", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "First page" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Next page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Last page" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Pierwsza strona" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Poprzednia strona" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Następna strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Ostatnia strona" })).toBeEnabled();
   });
 
   it("disables Next and Last buttons on last page", () => {
@@ -35,10 +35,10 @@ describe("PaginationControls", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "First page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Previous page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Last page" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Pierwsza strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Poprzednia strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Następna strona" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Ostatnia strona" })).toBeDisabled();
   });
 
   it("shows correct range for first page", () => {
@@ -92,7 +92,7 @@ describe("PaginationControls", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Next page" }));
+    await user.click(screen.getByRole("button", { name: "Następna strona" }));
     expect(onOffsetChange).toHaveBeenCalledWith(10);
   });
 
@@ -110,7 +110,7 @@ describe("PaginationControls", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Previous page" }));
+    await user.click(screen.getByRole("button", { name: "Poprzednia strona" }));
     expect(onOffsetChange).toHaveBeenCalledWith(10);
   });
 
@@ -128,7 +128,7 @@ describe("PaginationControls", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "First page" }));
+    await user.click(screen.getByRole("button", { name: "Pierwsza strona" }));
     expect(onOffsetChange).toHaveBeenCalledWith(0);
   });
 
@@ -146,7 +146,7 @@ describe("PaginationControls", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Last page" }));
+    await user.click(screen.getByRole("button", { name: "Ostatnia strona" }));
     // lastPage = (Math.ceil(42/10) - 1) * 10 = 40
     expect(onOffsetChange).toHaveBeenCalledWith(40);
   });
@@ -163,9 +163,9 @@ describe("PaginationControls", () => {
       />,
     );
 
-    expect(screen.getByRole("button", { name: "First page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Previous page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Next page" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Last page" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Pierwsza strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Poprzednia strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Następna strona" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Ostatnia strona" })).toBeEnabled();
   });
 });

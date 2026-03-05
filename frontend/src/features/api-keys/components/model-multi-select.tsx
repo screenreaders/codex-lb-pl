@@ -17,12 +17,14 @@ export type ModelMultiSelectProps = {
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
+  ariaLabel?: string;
 };
 
 export function ModelMultiSelect({
   value,
   onChange,
   placeholder = "Wszystkie modele",
+  ariaLabel = "Dozwolone modele",
 }: ModelMultiSelectProps) {
   const { data: models = [], isLoading } = useModels();
   const [search, setSearch] = useState("");
@@ -71,9 +73,10 @@ export function ModelMultiSelect({
             variant="outline"
             className="w-full justify-between font-normal"
             disabled={isLoading}
+            aria-label={ariaLabel}
           >
             <span className="truncate text-left">{isLoading ? "Ładowanie modeli..." : label}</span>
-            <ChevronsUpDown className="ml-1 size-4 shrink-0 opacity-50" />
+            <ChevronsUpDown className="ml-1 size-4 shrink-0 opacity-50" aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-64">
@@ -83,6 +86,7 @@ export function ModelMultiSelect({
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Szukaj modeli..."
               className="h-7 text-xs"
+              aria-label="Szukaj modeli"
               onClick={(e) => e.stopPropagation()}
               onKeyDown={(e) => e.stopPropagation()}
             />
@@ -121,8 +125,9 @@ export function ModelMultiSelect({
                 type="button"
                 className="hover:text-foreground ml-0.5"
                 onClick={() => remove(modelId)}
+                aria-label={`Usuń model ${modelId}`}
               >
-                <X className="size-3" />
+                <X className="size-3" aria-hidden="true" />
               </button>
             </Badge>
           ))}

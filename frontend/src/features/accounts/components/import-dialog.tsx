@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ export function ImportDialog({
   onImport,
 }: ImportDialogProps) {
   const [file, setFile] = useState<File | null>(null);
+  const errorId = useId();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,11 +57,17 @@ export function ImportDialog({
               type="file"
               accept="application/json,.json"
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              aria-describedby={error ? errorId : undefined}
             />
           </div>
 
           {error ? (
-            <p className="rounded-md border border-destructive/30 bg-destructive/10 px-2 py-1 text-xs text-destructive">
+            <p
+              id={errorId}
+              role="alert"
+              aria-live="assertive"
+              className="rounded-md border border-destructive/30 bg-destructive/10 px-2 py-1 text-xs text-destructive"
+            >
               {error}
             </p>
           ) : null}

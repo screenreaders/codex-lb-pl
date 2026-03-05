@@ -49,8 +49,8 @@ describe("TotpSettings", () => {
     renderWithClient(
       <TotpSettings settings={baseSettings} onSave={vi.fn().mockResolvedValue(undefined)} />,
     );
-    expect(screen.getByRole("button", { name: "Enable TOTP" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Disable" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Włącz TOTP" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Wyłącz" })).not.toBeInTheDocument();
   });
 
   it("shows disable button when configured", () => {
@@ -60,8 +60,8 @@ describe("TotpSettings", () => {
         onSave={vi.fn().mockResolvedValue(undefined)}
       />,
     );
-    expect(screen.getByRole("button", { name: "Disable" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Enable TOTP" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Wyłącz" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Włącz TOTP" })).not.toBeInTheDocument();
   });
 
   it("supports setup flow via dialog", async () => {
@@ -79,14 +79,14 @@ describe("TotpSettings", () => {
       <TotpSettings settings={baseSettings} onSave={onSave} />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Enable TOTP" }));
+    await user.click(screen.getByRole("button", { name: "Włącz TOTP" }));
 
     // Dialog opens with QR and secret
-    expect(await screen.findByText("Secret: SECRET123")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "TOTP QR code" })).toBeInTheDocument();
+    expect(await screen.findByText("Sekret: SECRET123")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Kod QR TOTP" })).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Verification code"), "123456");
-    await user.click(screen.getByRole("button", { name: "Confirm setup" }));
+    await user.type(screen.getByLabelText("Kod weryfikacyjny"), "123456");
+    await user.click(screen.getByRole("button", { name: "Potwierdź konfigurację" }));
     expect(confirmTotpSetup).toHaveBeenCalledWith({ secret: "SECRET123", code: "123456" });
   });
 
@@ -123,11 +123,11 @@ describe("TotpSettings", () => {
       />,
     );
 
-    await user.click(screen.getByRole("button", { name: "Disable" }));
+    await user.click(screen.getByRole("button", { name: "Wyłącz" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("TOTP code"), "654321");
-    await user.click(screen.getByRole("button", { name: "Disable TOTP" }));
+    await user.type(screen.getByLabelText("Kod TOTP"), "654321");
+    await user.click(screen.getByRole("button", { name: "Wyłącz TOTP" }));
     expect(disableTotp).toHaveBeenCalledWith({ code: "654321" });
   });
 });

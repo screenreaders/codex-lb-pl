@@ -9,8 +9,8 @@ describe("AccountCard", () => {
     const account = createAccountSummary();
     render(<AccountCard account={account} />);
 
-    expect(screen.getByText("Primary")).toBeInTheDocument();
-    expect(screen.getByText("Secondary")).toBeInTheDocument();
+    expect(screen.getByText("Główne")).toBeInTheDocument();
+    expect(screen.getByText("Wtórne")).toBeInTheDocument();
   });
 
   it("hides primary quota bar for weekly-only accounts", () => {
@@ -26,7 +26,7 @@ describe("AccountCard", () => {
 
     render(<AccountCard account={account} />);
 
-    expect(screen.queryByText("Primary")).not.toBeInTheDocument();
-    expect(screen.getByText("Secondary")).toBeInTheDocument();
+    expect(screen.queryByText("Główne")).not.toBeInTheDocument();
+    expect(screen.getByText("Wtórne")).toBeInTheDocument();
   });
 });

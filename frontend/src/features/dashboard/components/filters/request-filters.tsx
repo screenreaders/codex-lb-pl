@@ -41,10 +41,11 @@ export function RequestFilters({
             onChange={(event) => onSearchChange(event.target.value)}
             className="h-8 pl-9"
             placeholder="Szukaj ID żądania, konta, modelu, błędu..."
+            aria-label="Szukaj w logach żądań"
           />
         </div>
 
-        <TimeframeSelect value={filters.timeframe} onChange={onTimeframeChange} />
+        <TimeframeSelect value={filters.timeframe} onChange={onTimeframeChange} ariaLabel="Filtr zakresu czasu logów" />
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

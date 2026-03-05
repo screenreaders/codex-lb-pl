@@ -27,8 +27,8 @@ describe("LoginForm", () => {
 
     render(<LoginForm />);
 
-    await user.type(screen.getByLabelText("Password"), "secret-pass");
-    await user.click(screen.getByRole("button", { name: "Sign In" }));
+    await user.type(screen.getByLabelText("Hasło"), "secret-pass");
+    await user.click(screen.getByRole("button", { name: "Zaloguj się" }));
 
     expect(clearError).toHaveBeenCalledTimes(1);
     expect(login).toHaveBeenCalledWith("secret-pass");
@@ -51,7 +51,7 @@ describe("LoginForm", () => {
     });
 
     render(<LoginForm />);
-    expect(screen.getByLabelText("Password")).toBeDisabled();
-    expect(screen.getByRole("button", { name: "Sign In" })).toBeDisabled();
+    expect(screen.getByLabelText("Hasło")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Zaloguj się" })).toBeDisabled();
   });
 });

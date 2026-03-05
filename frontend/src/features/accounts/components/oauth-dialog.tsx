@@ -1,5 +1,5 @@
 import { Check, CircleAlert, Copy, ExternalLink, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,14 +24,53 @@ function getStage(state: OAuthState): Stage {
   return "intro";
 }
 
-function CopyButton({ text }: { text: string }) {
+function getStepLabel(stage: Stage): string {
+  if (stage === "intro") return "Krok 1 z 3";
+  if (stage === "browser" || stage === "device") return "Krok 2 z 3";
+  if (stage === "success") return "Krok 3 z 3";
+  return "Krok 2 z 3";
+}
+
+function getStageLiveMessage(stage: Stage, state: OAuthState): string {
+  if (stage === "intro") return "Wybierz metodę logowania, a następnie rozpocznij autoryzację.";
+  if (stage === "browser") return "Oczekiwanie na zakończenie autoryzacji w przeglądarce.";
+  if (stage === "device") {
+    if (state.userCode) {
+      return `Wpisz kod użytkownika ${state.userCode} na stronie weryfikacyjnej i dokończ logowanie.`;
+    }
+    return "Otwórz link weryfikacyjny i dokończ autoryzację kodem urządzenia.";
+  }
+  if (stage === "success") return "Konto zostało pomyślnie dodane.";
+  return state.errorMessage || "Autoryzacja nieudana.";
+}
+
+function getStageDescription(stage: Stage): string {
+  if (stage === "intro") return "Wybierz metodę logowania i dokończ autoryzację.";
+  if (stage === "browser") return "Otwórz stronę logowania i wróć tutaj po autoryzacji.";
+  if (stage === "device") return "Wykonaj kroki weryfikacji kodem urządzenia, a następnie wróć do tego okna.";
+  if (stage === "success") return "Konto jest gotowe do użycia. Możesz zamknąć okno.";
+  return "Wystąpił błąd autoryzacji. Możesz spróbować ponownie albo zamknąć okno.";
+}
+
+type CopyButtonProps = {
+  text: string;
+  ariaLabel: string;
+  onCopyFeedback: (message: string) => void;
+};
+
+function CopyButton({ text, ariaLabel, onCopyFeedback }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [text]);
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      onCopyFeedback("Skopiowano do schowka.");
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      onCopyFeedback("Nie udało się skopiować do schowka.");
+    }
+  }, [onCopyFeedback, text]);
 
   return (
     <Button
@@ -39,16 +78,17 @@ function CopyButton({ text }: { text: string }) {
       size="sm"
       variant="ghost"
       className="h-7 gap-1 px-2 text-xs"
+      aria-label={copied ? `${ariaLabel}. Skopiowano.` : ariaLabel}
       onClick={() => void handleCopy()}
     >
       {copied ? (
         <>
-          <Check className="h-3 w-3" />
+          <Check className="h-3 w-3" aria-hidden="true" />
           Skopiowano!
         </>
       ) : (
         <>
-          <Copy className="h-3 w-3" />
+          <Copy className="h-3 w-3" aria-hidden="true" />
           Kopiuj
         </>
       )}
@@ -75,7 +115,13 @@ export function OauthDialog({
 }: OauthDialogProps) {
   const [selectedMethod, setSelectedMethod] = useState<"browser" | "device">("browser");
   const stage = getStage(state);
+  const methodHelpId = useId();
+  const [copyFeedback, setCopyFeedback] = useState<{ id: number; message: string }>({
+    id: 0,
+    message: "",
+  });
   const completedRef = useRef(false);
+  const stageLiveMessage = open ? getStageLiveMessage(stage, state) : "";
 
   useEffect(() => {
     if (stage === "success" && !completedRef.current) {
@@ -92,6 +138,7 @@ export function OauthDialog({
     if (!next) {
       onReset();
       setSelectedMethod("browser");
+      setCopyFeedback({ id: 0, message: "" });
     }
   };
 
@@ -103,52 +150,82 @@ export function OauthDialog({
     onReset();
   };
 
+  const handleCopyFeedback = useCallback((scope: string, message: string) => {
+    setCopyFeedback((prev) => ({
+      id: prev.id + 1,
+      message: `${scope}: ${message}`,
+    }));
+  }, [setCopyFeedback]);
+
   return (
     <Dialog open={open} onOpenChange={close}>
       <DialogContent>
+        <p key={stage} className="sr-only" aria-live={stage === "error" ? "assertive" : "polite"} aria-atomic="true">
+          {stageLiveMessage}
+        </p>
+        <p key={copyFeedback.id} className="sr-only" aria-live="polite" aria-atomic="true">
+          {copyFeedback.message}
+        </p>
         <DialogHeader>
+          <p className="text-xs font-medium text-muted-foreground">{getStepLabel(stage)}</p>
           <DialogTitle>
             {stage === "success" ? "Konto dodane" : stage === "error" ? "Autoryzacja nieudana" : "Dodaj konto przez OAuth"}
           </DialogTitle>
-          {stage === "intro" ? (
-            <DialogDescription>Wybierz metodę logowania i dokończ autoryzację.</DialogDescription>
-          ) : null}
+          <DialogDescription>{getStageDescription(stage)}</DialogDescription>
         </DialogHeader>
 
         {/* Intro stage */}
         {stage === "intro" ? (
-          <div className="space-y-2">
-            <button
-              type="button"
-              onClick={() => setSelectedMethod("browser")}
+          <fieldset className="space-y-2" aria-describedby={methodHelpId}>
+            <legend className="text-sm font-medium">Metoda logowania</legend>
+            <p id={methodHelpId} className="text-xs text-muted-foreground">
+              Wybierz jedną z opcji. NVDA odczyta aktualnie zaznaczoną metodę.
+            </p>
+
+            <label
               className={cn(
-                "w-full rounded-lg border p-3 text-left transition-colors",
+                "block w-full cursor-pointer rounded-lg border p-3 text-left transition-colors focus-within:ring-2 focus-within:ring-ring/60",
                 selectedMethod === "browser"
                   ? "border-primary bg-primary/5"
                   : "hover:bg-muted/50",
               )}
             >
+              <input
+                type="radio"
+                name="oauth-method"
+                value="browser"
+                className="sr-only"
+                checked={selectedMethod === "browser"}
+                onChange={() => setSelectedMethod("browser")}
+              />
               <p className="text-sm font-medium">Przeglądarka (PKCE)</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Otwiera okno przeglądarki do logowania. Polecane dla większości użytkowników.
               </p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedMethod("device")}
+            </label>
+
+            <label
               className={cn(
-                "w-full rounded-lg border p-3 text-left transition-colors",
+                "block w-full cursor-pointer rounded-lg border p-3 text-left transition-colors focus-within:ring-2 focus-within:ring-ring/60",
                 selectedMethod === "device"
                   ? "border-primary bg-primary/5"
                   : "hover:bg-muted/50",
               )}
             >
+              <input
+                type="radio"
+                name="oauth-method"
+                value="device"
+                className="sr-only"
+                checked={selectedMethod === "device"}
+                onChange={() => setSelectedMethod("device")}
+              />
               <p className="text-sm font-medium">Kod urządzenia</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 Użyj kodu na innym urządzeniu. Przydatne w środowiskach bez interfejsu.
               </p>
-            </button>
-          </div>
+            </label>
+          </fieldset>
         ) : null}
 
         {/* Browser stage */}
@@ -159,12 +236,16 @@ export function OauthDialog({
                 <p className="text-xs font-medium text-muted-foreground">URL autoryzacji</p>
                 <div className="flex min-w-0 items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 truncate font-mono text-xs">{state.authorizationUrl}</p>
-                  <CopyButton text={state.authorizationUrl} />
+                  <CopyButton
+                    text={state.authorizationUrl}
+                    ariaLabel="Skopiuj URL autoryzacji"
+                    onCopyFeedback={(message) => handleCopyFeedback("URL autoryzacji", message)}
+                  />
                 </div>
               </div>
             ) : null}
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <div role="status" aria-live="polite" aria-atomic="true" className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
               <span>Oczekiwanie na zakończenie autoryzacji...</span>
             </div>
           </div>
@@ -184,7 +265,11 @@ export function OauthDialog({
                 <p className="text-xs font-medium text-muted-foreground">Kod użytkownika</p>
                 <div className="flex items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 font-mono text-lg font-bold tracking-widest">{state.userCode}</p>
-                  <CopyButton text={state.userCode} />
+                  <CopyButton
+                    text={state.userCode}
+                    ariaLabel="Skopiuj kod użytkownika"
+                    onCopyFeedback={(message) => handleCopyFeedback("Kod użytkownika", message)}
+                  />
                 </div>
               </div>
             ) : null}
@@ -194,13 +279,17 @@ export function OauthDialog({
                 <p className="text-xs font-medium text-muted-foreground">URL weryfikacji</p>
                 <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-muted/20 px-3 py-2">
                   <p className="min-w-0 flex-1 truncate break-all font-mono text-xs">{state.verificationUrl}</p>
-                  <CopyButton text={state.verificationUrl} />
+                  <CopyButton
+                    text={state.verificationUrl}
+                    ariaLabel="Skopiuj URL weryfikacji"
+                    onCopyFeedback={(message) => handleCopyFeedback("URL weryfikacji", message)}
+                  />
                 </div>
               </div>
             ) : null}
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <div role="status" aria-live="polite" aria-atomic="true" className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
               <span>
                 Oczekiwanie na autoryzację
                 {state.expiresInSeconds != null && state.expiresInSeconds > 0
@@ -213,16 +302,16 @@ export function OauthDialog({
 
         {/* Success stage */}
         {stage === "success" ? (
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-700 dark:text-emerald-400">
-            <Check className="h-4 w-4 shrink-0" />
+          <div role="status" aria-live="polite" className="flex items-center gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+            <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
             <p>Konto zostało pomyślnie dodane.</p>
           </div>
         ) : null}
 
         {/* Error stage */}
         {stage === "error" ? (
-          <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-3 text-sm text-destructive">
-            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+          <div role="alert" aria-live="assertive" className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-3 text-sm text-destructive">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             <p>{state.errorMessage || "Wystąpił nieznany błąd."}</p>
           </div>
         ) : null}
@@ -247,7 +336,7 @@ export function OauthDialog({
               {state.authorizationUrl ? (
                 <Button type="button" asChild>
                   <a href={state.authorizationUrl} target="_blank" rel="noreferrer">
-                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     Otwórz stronę logowania
                   </a>
                 </Button>
@@ -263,7 +352,7 @@ export function OauthDialog({
               {state.verificationUrl ? (
                 <Button type="button" asChild>
                   <a href={state.verificationUrl} target="_blank" rel="noreferrer">
-                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                    <ExternalLink className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     Otwórz link
                   </a>
                 </Button>

@@ -15,6 +15,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -83,6 +84,9 @@ export function RecentRequestsTable({
     <div className="rounded-xl border bg-card">
       <div className="relative overflow-x-auto">
         <Table className="min-w-[800px] table-fixed">
+          <TableCaption className="sr-only">
+            Tabela ostatnich żądań z kolumnami: czas, konto, model, status, tokeny, koszt i błąd.
+          </TableCaption>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-28 pl-4 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">Czas</TableHead>
@@ -149,6 +153,7 @@ export function RecentRequestsTable({
                           variant="ghost"
                           size="sm"
                           className="h-5 shrink-0 px-1.5 text-[11px]"
+                          aria-label={`Pokaż pełny błąd dla żądania ${request.requestId}`}
                           onClick={() => setViewingError(errorMessage)}
                         >
                           Pokaż

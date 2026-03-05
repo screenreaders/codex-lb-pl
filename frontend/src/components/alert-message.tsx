@@ -20,9 +20,16 @@ const variantIcons: Record<AlertMessageProps["variant"], React.ElementType> = {
 
 export function AlertMessage({ variant, className, children }: AlertMessageProps) {
   const Icon = variantIcons[variant];
+  const liveMode = variant === "error" ? "assertive" : "polite";
+
   return (
-    <div className={cn("flex items-start gap-2.5 rounded-lg px-3 py-2 text-xs font-medium", variantStyles[variant], className)}>
-      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+    <div
+      role={variant === "error" ? "alert" : "status"}
+      aria-live={liveMode}
+      aria-atomic="true"
+      className={cn("flex items-start gap-2.5 rounded-lg px-3 py-2 text-xs font-medium", variantStyles[variant], className)}
+    >
+      <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
       <span>{children}</span>
     </div>
   );

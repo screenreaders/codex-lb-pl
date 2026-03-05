@@ -28,7 +28,7 @@ function makePoints(count: number, baseValue: number) {
 describe("AccountTrendChart", () => {
   it("renders empty state when no data is provided", () => {
     render(<AccountTrendChart primary={[]} secondary={[]} />);
-    expect(screen.getByText("No trend data available")).toBeInTheDocument();
+    expect(screen.getByText("Brak danych trendu")).toBeInTheDocument();
   });
 
   it("renders chart container when data is provided", () => {

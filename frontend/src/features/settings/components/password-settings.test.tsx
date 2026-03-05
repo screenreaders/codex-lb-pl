@@ -27,16 +27,16 @@ describe("PasswordSettings", () => {
 
   it("shows setup button when no password is set", () => {
     render(<PasswordSettings />);
-    expect(screen.getByRole("button", { name: "Set password" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Change" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ustaw hasło" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Zmień" })).not.toBeInTheDocument();
   });
 
   it("shows change/remove buttons when password is configured", () => {
     useAuthStore.setState({ passwordRequired: true });
     render(<PasswordSettings />);
-    expect(screen.getByRole("button", { name: "Change" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Remove" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Set password" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Zmień" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Usuń" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Ustaw hasło" })).not.toBeInTheDocument();
   });
 
   it("handles setup flow via dialog", async () => {
@@ -45,12 +45,12 @@ describe("PasswordSettings", () => {
 
     render(<PasswordSettings />);
 
-    await user.click(screen.getByRole("button", { name: "Set password" }));
+    await user.click(screen.getByRole("button", { name: "Ustaw hasło" }));
     // Dialog opens
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Password"), "new-password-1");
-    await user.click(screen.getAllByRole("button", { name: "Set password" }).find((btn) => btn.getAttribute("type") === "submit")!);
+    await user.type(screen.getByLabelText("Hasło"), "new-password-1");
+    await user.click(screen.getAllByRole("button", { name: "Ustaw hasło" }).find((btn) => btn.getAttribute("type") === "submit")!);
     expect(setupPassword).toHaveBeenCalledWith({ password: "new-password-1" });
   });
 
@@ -61,12 +61,12 @@ describe("PasswordSettings", () => {
 
     render(<PasswordSettings />);
 
-    await user.click(screen.getByRole("button", { name: "Change" }));
+    await user.click(screen.getByRole("button", { name: "Zmień" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Current password"), "current-password");
-    await user.type(screen.getByLabelText("New password"), "changed-password");
-    await user.click(screen.getByRole("button", { name: "Change password" }));
+    await user.type(screen.getByLabelText("Obecne hasło"), "current-password");
+    await user.type(screen.getByLabelText("Nowe hasło"), "changed-password");
+    await user.click(screen.getByRole("button", { name: "Zmień hasło" }));
     expect(changePassword).toHaveBeenCalledWith({
       currentPassword: "current-password",
       newPassword: "changed-password",
@@ -80,11 +80,11 @@ describe("PasswordSettings", () => {
 
     render(<PasswordSettings />);
 
-    await user.click(screen.getByRole("button", { name: "Remove" }));
+    await user.click(screen.getByRole("button", { name: "Usuń" }));
     expect(screen.getByRole("dialog")).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Current password"), "changed-password");
-    await user.click(screen.getByRole("button", { name: "Remove password" }));
+    await user.type(screen.getByLabelText("Obecne hasło"), "changed-password");
+    await user.click(screen.getByRole("button", { name: "Usuń hasło" }));
     expect(removePassword).toHaveBeenCalledWith({ password: "changed-password" });
   });
 
@@ -94,9 +94,9 @@ describe("PasswordSettings", () => {
 
     render(<PasswordSettings />);
 
-    await user.click(screen.getByRole("button", { name: "Set password" }));
-    await user.type(screen.getByLabelText("Password"), "new-password-1");
-    await user.click(screen.getAllByRole("button", { name: "Set password" }).find((btn) => btn.getAttribute("type") === "submit")!);
+    await user.click(screen.getByRole("button", { name: "Ustaw hasło" }));
+    await user.type(screen.getByLabelText("Hasło"), "new-password-1");
+    await user.click(screen.getAllByRole("button", { name: "Ustaw hasło" }).find((btn) => btn.getAttribute("type") === "submit")!);
 
     expect(await screen.findByText("setup failed")).toBeInTheDocument();
   });

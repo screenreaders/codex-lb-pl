@@ -25,10 +25,10 @@ describe("ApiKeyEditDialog", () => {
       />,
     );
 
-    const nameInput = screen.getByLabelText("Name");
+    const nameInput = screen.getByLabelText("Nazwa");
     await user.clear(nameInput);
     await user.type(nameInput, "Renamed key");
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Zapisz" }));
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -54,10 +54,10 @@ describe("ApiKeyEditDialog", () => {
       />,
     );
 
-    const activeRow = screen.getByText("Active").closest("div");
+    const activeRow = screen.getByText("Aktywny").closest("div");
     if (!activeRow) throw new Error("Active row not found");
     await user.click(within(activeRow).getByRole("switch"));
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Zapisz" }));
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -86,7 +86,7 @@ describe("ApiKeyEditDialog", () => {
     const tokenLimitInput = screen.getByDisplayValue(String(apiKey.limits[0].maxValue));
     await user.clear(tokenLimitInput);
     await user.type(tokenLimitInput, "999999");
-    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("button", { name: "Zapisz" }));
 
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledTimes(1);

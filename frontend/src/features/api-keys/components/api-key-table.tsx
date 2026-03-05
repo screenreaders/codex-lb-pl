@@ -13,6 +13,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -69,6 +70,9 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
   return (
     <div className="overflow-x-auto rounded-xl border">
     <Table className="table-fixed">
+      <TableCaption className="sr-only">
+        Tabela kluczy API z kolumnami: nazwa, prefiks, modele, użycie, ważność, status i akcje.
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead className="w-[12%] pl-4 text-[11px] uppercase tracking-wider text-muted-foreground/80">Nazwa</TableHead>
@@ -100,23 +104,29 @@ export function ApiKeyTable({ keys, busy, onEdit, onDelete, onRegenerate }: ApiK
               <TableCell className="pr-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button type="button" size="icon-sm" variant="ghost" disabled={busy}>
-                      <Ellipsis className="size-4" />
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      variant="ghost"
+                      disabled={busy}
+                      aria-label={`Akcje dla klucza ${apiKey.name}`}
+                    >
+                      <Ellipsis className="size-4" aria-hidden="true" />
                       <span className="sr-only">Akcje</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onEdit(apiKey)}>
-                      <Pencil className="size-4" />
+                      <Pencil className="size-4" aria-hidden="true" />
                       Edytuj
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onRegenerate(apiKey)}>
-                      <RefreshCw className="size-4" />
+                      <RefreshCw className="size-4" aria-hidden="true" />
                       Wygeneruj ponownie
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem variant="destructive" onClick={() => onDelete(apiKey)}>
-                      <Trash2 className="size-4" />
+                      <Trash2 className="size-4" aria-hidden="true" />
                       Usuń
                     </DropdownMenuItem>
                   </DropdownMenuContent>

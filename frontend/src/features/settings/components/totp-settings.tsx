@@ -166,6 +166,7 @@ export function TotpSettings({ settings, disabled = false, onSave }: TotpSetting
           <Switch
             checked={settings.totpRequiredOnLogin}
             disabled={lock}
+            aria-label="Wymagaj TOTP przy logowaniu"
             onCheckedChange={(checked) =>
               void onSave({
                 stickyThreadsEnabled: settings.stickyThreadsEnabled,

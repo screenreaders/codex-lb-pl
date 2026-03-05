@@ -45,6 +45,7 @@ export function ImportSettings({ settings, busy, onSave }: ImportSettingsProps) 
           <Switch
             checked={settings.importWithoutOverwrite}
             disabled={busy}
+            aria-label="Zezwól na import bez nadpisywania"
             onCheckedChange={(checked) => save({ importWithoutOverwrite: checked })}
           />
         </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import type { LimitRuleCreate } from "@/features/api-keys/schemas";
 export type LimitRulesEditorProps = {
   rules: LimitRuleCreate[];
   onChange: (rules: LimitRuleCreate[]) => void;
+  ariaLabel?: string;
 };
 
 function makeDefaultRule(): LimitRuleCreate {
@@ -21,7 +22,7 @@ function makeDefaultRule(): LimitRuleCreate {
   };
 }
 
-export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
+export function LimitRulesEditor({ rules, onChange, ariaLabel = "Limity klucza API" }: LimitRulesEditorProps) {
   const [advanced, setAdvanced] = useState(() => {
     if (rules.length === 0) return false;
     // If any non-standard rule exists, start in advanced mode
@@ -40,6 +41,8 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
   const weeklyCostRule = rules.find(
     (r) => r.limitType === "cost_usd" && r.limitWindow === "weekly" && !r.modelFilter,
   );
+  const tokenInputId = useId();
+  const costInputId = useId();
 
   const handleBasicTokenChange = (raw: string) => {
     const val = raw ? parseInt(raw, 10) : 0;
@@ -91,7 +94,7 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" aria-label={ariaLabel}>
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">Limity</span>
         <div className="flex items-center gap-2">
@@ -99,6 +102,7 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
           <Switch
             checked={advanced}
             onCheckedChange={setAdvanced}
+            aria-label="Przełącz tryb zaawansowany limitów"
           />
         </div>
       </div>
@@ -106,8 +110,9 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
       {!advanced ? (
         <div className="space-y-2">
           <div>
-            <label className="text-xs text-muted-foreground">Tygodniowy limit tokenów</label>
+            <label htmlFor={tokenInputId} className="text-xs text-muted-foreground">Tygodniowy limit tokenów</label>
             <Input
+              id={tokenInputId}
               type="number"
               min={1}
               value={weeklyTokenRule ? String(weeklyTokenRule.maxValue) : ""}
@@ -116,8 +121,9 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
             />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Tygodniowy limit kosztu ($)</label>
+            <label htmlFor={costInputId} className="text-xs text-muted-foreground">Tygodniowy limit kosztu ($)</label>
             <Input
+              id={costInputId}
               type="number"
               min={0.01}
               step={0.01}
@@ -148,7 +154,7 @@ export function LimitRulesEditor({ rules, onChange }: LimitRulesEditorProps) {
             className="w-full"
             onClick={addRule}
           >
-            <Plus className="mr-1 size-3.5" />
+            <Plus className="mr-1 size-3.5" aria-hidden="true" />
             Dodaj regułę limitu
           </Button>
           {rules.length > 1 ? (

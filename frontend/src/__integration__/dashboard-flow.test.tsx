@@ -42,8 +42,8 @@ describe("dashboard flow integration", () => {
     window.history.pushState({}, "", "/dashboard");
     renderWithProviders(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
-    expect(await screen.findByText("Request Logs")).toBeInTheDocument();
+    expect(await screen.findByText("Przegląd, stan kont i ostatnie logi żądań.", {}, { timeout: 5000 })).toBeInTheDocument();
+    expect(await screen.findByText("Logi żądań", {}, { timeout: 5000 })).toBeInTheDocument();
 
     await waitFor(() => {
       expect(overviewCalls).toBeGreaterThan(0);
@@ -54,7 +54,7 @@ describe("dashboard flow integration", () => {
     const logsAfterLoad = requestLogCalls;
 
     await user.type(
-      screen.getByPlaceholderText("Search request id, account, model, error..."),
+      screen.getByPlaceholderText("Szukaj ID żądania, konta, modelu, błędu..."),
       "quota",
     );
 
@@ -64,7 +64,7 @@ describe("dashboard flow integration", () => {
     expect(overviewCalls).toBe(overviewAfterLoad);
 
     const logsAfterFilter = requestLogCalls;
-    await user.click(screen.getByRole("button", { name: "Next page" }));
+    await user.click(screen.getByRole("button", { name: "Następna strona" }));
 
     await waitFor(() => {
       expect(requestLogCalls).toBeGreaterThan(logsAfterFilter);

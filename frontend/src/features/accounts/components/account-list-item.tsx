@@ -42,6 +42,9 @@ export function AccountListItem({ account, selected, showAccountId = false, onSe
   return (
     <button
       type="button"
+      role="option"
+      aria-selected={selected}
+      aria-label={`${title}. ${subtitle}. Status: ${status}.`}
       onClick={() => onSelect(account.accountId)}
       className={cn(
         "w-full rounded-lg px-3 py-2.5 text-left transition-colors",

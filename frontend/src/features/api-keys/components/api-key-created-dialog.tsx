@@ -1,7 +1,5 @@
-import { useCallback, useState } from "react";
-import { Check, Copy } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/copy-button";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +31,7 @@ export function ApiKeyCreatedDialog({ open, apiKey, onOpenChange }: ApiKeyCreate
             <p className="text-xs font-medium text-muted-foreground">Klucz API</p>
             <div className="flex min-w-0 items-center gap-2 overflow-hidden rounded-lg border bg-muted/20 px-3 py-2">
               <p className="min-w-0 flex-1 truncate font-mono text-xs">{apiKey}</p>
-              <InlineCopyButton text={apiKey} />
+              <CopyButton value={apiKey} label="Kopiuj" ariaLabel="Skopiuj klucz API" />
             </div>
           </div>
         ) : null}
@@ -45,37 +43,5 @@ export function ApiKeyCreatedDialog({ open, apiKey, onOpenChange }: ApiKeyCreate
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function InlineCopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = useCallback(async () => {
-    await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [text]);
-
-  return (
-    <Button
-      type="button"
-      size="sm"
-      variant="ghost"
-      className="h-7 shrink-0 gap-1 px-2 text-xs"
-      onClick={() => void handleCopy()}
-    >
-      {copied ? (
-        <>
-          <Check className="h-3 w-3" />
-          Skopiowano!
-        </>
-      ) : (
-        <>
-          <Copy className="h-3 w-3" />
-          Kopiuj
-        </>
-      )}
-    </Button>
   );
 }

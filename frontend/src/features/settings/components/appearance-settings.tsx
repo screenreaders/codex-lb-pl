@@ -33,12 +33,14 @@ export function AppearanceSettings() {
             <p className="text-sm font-medium">Motyw</p>
             <p className="text-xs text-muted-foreground">Wybierz preferowany schemat kolorów.</p>
           </div>
-          <div className="flex items-center gap-1 rounded-lg border border-border/50 bg-muted/40 p-0.5">
+          <div role="group" aria-label="Wybór motywu" className="flex items-center gap-1 rounded-lg border border-border/50 bg-muted/40 p-0.5">
             {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
               <button
                 key={value}
                 type="button"
                 onClick={() => setTheme(value)}
+                aria-pressed={preference === value}
+                aria-label={`Ustaw motyw: ${label}`}
                 className={cn(
                   "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200",
                   preference === value
@@ -46,7 +48,7 @@ export function AppearanceSettings() {
                     : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <Icon className="h-3.5 w-3.5" />
+                <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                 {label}
               </button>
             ))}

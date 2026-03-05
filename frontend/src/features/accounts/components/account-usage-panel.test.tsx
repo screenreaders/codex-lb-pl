@@ -17,7 +17,7 @@ describe("AccountUsagePanel", () => {
 
     render(<AccountUsagePanel account={account} trends={null} />);
 
-    expect(screen.getByText("Primary remaining")).toBeInTheDocument();
+    expect(screen.getByText("Pozostało (Główne)")).toBeInTheDocument();
     expect(screen.getByText("--")).toBeInTheDocument();
   });
 
@@ -34,7 +34,7 @@ describe("AccountUsagePanel", () => {
 
     render(<AccountUsagePanel account={account} trends={null} />);
 
-    expect(screen.queryByText("Primary remaining")).not.toBeInTheDocument();
-    expect(screen.getByText("Secondary remaining")).toBeInTheDocument();
+    expect(screen.queryByText("Pozostało (Główne)")).not.toBeInTheDocument();
+    expect(screen.getByText("Pozostało (Wtórne)")).toBeInTheDocument();
   });
 });

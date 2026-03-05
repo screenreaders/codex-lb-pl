@@ -35,18 +35,18 @@ describe("CopyButton", () => {
 
     render(<CopyButton value="secret-value" />);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+      fireEvent.click(screen.getByRole("button", { name: "Kopiuj" }));
       await Promise.resolve();
     });
 
     expect(writeText).toHaveBeenCalledWith("secret-value");
-    expect(toastSuccess).toHaveBeenCalledWith("Copied to clipboard");
-    expect(screen.getByRole("button", { name: "Copied" })).toBeInTheDocument();
+    expect(toastSuccess).toHaveBeenCalledWith("Skopiowano do schowka");
+    expect(screen.getByRole("button", { name: "Kopiuj. Skopiowano." })).toBeInTheDocument();
 
     act(() => {
       vi.advanceTimersByTime(1_200);
     });
-    expect(screen.getByRole("button", { name: "Copy" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Kopiuj" })).toBeInTheDocument();
   });
 
   it("shows error toast when clipboard write fails", async () => {
@@ -58,10 +58,10 @@ describe("CopyButton", () => {
 
     render(<CopyButton value="secret-value" />);
     await act(async () => {
-      fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+      fireEvent.click(screen.getByRole("button", { name: "Kopiuj" }));
       await Promise.resolve();
     });
 
-    expect(toastError).toHaveBeenCalledWith("Failed to copy");
+    expect(toastError).toHaveBeenCalledWith("Nie udało się skopiować");
   });
 });

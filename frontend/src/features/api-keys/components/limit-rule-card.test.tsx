@@ -33,7 +33,7 @@ describe("LimitRuleCard", () => {
       <LimitRuleCard rule={tokenRule()} onChange={vi.fn()} onRemove={vi.fn()} />,
     );
 
-    expect(screen.getByText("Max value (tokens)")).toBeInTheDocument();
+    expect(screen.getByText("Maksymalna wartość (tokeny)")).toBeInTheDocument();
     expect(screen.getByDisplayValue("100000")).toBeInTheDocument();
   });
 
@@ -42,7 +42,7 @@ describe("LimitRuleCard", () => {
       <LimitRuleCard rule={costRule()} onChange={vi.fn()} onRemove={vi.fn()} />,
     );
 
-    expect(screen.getByText("Max value (USD)")).toBeInTheDocument();
+    expect(screen.getByText("Maksymalna wartość (USD)")).toBeInTheDocument();
     expect(screen.getByDisplayValue("5")).toBeInTheDocument();
   });
 
@@ -124,7 +124,7 @@ describe("LimitRuleCard", () => {
 
     // ModelMultiSelect uses useModels which fetches from MSW
     await waitFor(() => {
-      expect(screen.getByText("All models")).toBeInTheDocument();
+      expect(screen.getByText("Wszystkie modele")).toBeInTheDocument();
     });
   });
 
@@ -138,7 +138,7 @@ describe("LimitRuleCard", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("1 model selected")).toBeInTheDocument();
+      expect(screen.getByText("Wybrano modeli: 1")).toBeInTheDocument();
     });
   });
 });

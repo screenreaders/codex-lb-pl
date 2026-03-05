@@ -53,18 +53,18 @@ describe("RecentRequestsTable", () => {
 
     expect(screen.getByText("Primary Account")).toBeInTheDocument();
     expect(screen.getByText("gpt-5.1 (high)")).toBeInTheDocument();
-    expect(screen.getByText("Rate limit")).toBeInTheDocument();
+    expect(screen.getByText("Limit")).toBeInTheDocument();
 
-    const viewButton = screen.getByRole("button", { name: "View" });
+    const viewButton = screen.getByRole("button", { name: /Pokaż pełny błąd dla żądania req-1/i });
     await user.click(viewButton);
     const dialog = screen.getByRole("dialog");
     expect(dialog).toBeInTheDocument();
-    expect(screen.getByText("Error Detail")).toBeInTheDocument();
+    expect(screen.getByText("Szczegóły błędu")).toBeInTheDocument();
     expect(dialog.textContent).toContain("Rate limit reached while processing this request");
   });
 
   it("renders empty state", () => {
     render(<RecentRequestsTable {...PAGINATION_PROPS} total={0} accounts={[]} requests={[]} />);
-    expect(screen.getByText("No request logs match the current filters.")).toBeInTheDocument();
+    expect(screen.getByText("Żadne logi żądań nie pasują do obecnych filtrów.")).toBeInTheDocument();
   });
 });

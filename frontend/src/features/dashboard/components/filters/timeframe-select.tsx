@@ -16,12 +16,13 @@ function isTimeframeValue(value: string): value is TimeframeValue {
 export type TimeframeSelectProps = {
   value: TimeframeValue;
   onChange: (value: TimeframeValue) => void;
+  ariaLabel?: string;
 };
 
-export function TimeframeSelect({ value, onChange }: TimeframeSelectProps) {
+export function TimeframeSelect({ value, onChange, ariaLabel = "Wybierz zakres czasu" }: TimeframeSelectProps) {
   return (
     <Select value={value} onValueChange={(next) => { if (isTimeframeValue(next)) onChange(next); }}>
-      <SelectTrigger size="sm" className="w-28">
+      <SelectTrigger size="sm" className="w-28" aria-label={ariaLabel}>
         <SelectValue placeholder="Zakres" />
       </SelectTrigger>
       <SelectContent align="start">

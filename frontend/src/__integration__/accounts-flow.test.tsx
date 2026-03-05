@@ -12,23 +12,23 @@ describe("accounts flow integration", () => {
     window.history.pushState({}, "", "/accounts");
     renderWithProviders(<App />);
 
-    expect(await screen.findByRole("heading", { name: "Accounts" })).toBeInTheDocument();
-    expect((await screen.findAllByText("primary@example.com")).length).toBeGreaterThan(0);
+    expect(await screen.findByText("Zarządzaj zaimportowanymi kontami i metodami uwierzytelniania.", {}, { timeout: 5000 })).toBeInTheDocument();
+    expect((await screen.findAllByText("primary@example.com", {}, { timeout: 5000 })).length).toBeGreaterThan(0);
     expect(screen.getByText("secondary@example.com")).toBeInTheDocument();
 
     await user.click(screen.getByText("secondary@example.com"));
-    expect(await screen.findByText("Token Status")).toBeInTheDocument();
+    expect(await screen.findByText("Status tokenów")).toBeInTheDocument();
 
-    const resumeButton = screen.queryByRole("button", { name: "Resume" });
+    const resumeButton = screen.queryByRole("button", { name: "Wznów" });
     if (resumeButton) {
       await user.click(resumeButton);
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Pause" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Wstrzymaj" })).toBeInTheDocument();
       });
     } else {
-      await user.click(screen.getByRole("button", { name: "Pause" }));
+      await user.click(screen.getByRole("button", { name: "Wstrzymaj" }));
       await waitFor(() => {
-        expect(screen.getByRole("button", { name: "Resume" })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: "Wznów" })).toBeInTheDocument();
       });
     }
   });

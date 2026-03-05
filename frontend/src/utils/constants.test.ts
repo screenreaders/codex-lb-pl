@@ -19,24 +19,24 @@ describe("STATUS_LABELS", () => {
       "limited",
       "paused",
     ]);
-    expect(STATUS_LABELS.active).toBe("Active");
-    expect(STATUS_LABELS.exceeded).toBe("Quota exceeded");
+    expect(STATUS_LABELS.active).toBe("Aktywne");
+    expect(STATUS_LABELS.exceeded).toBe("Przekroczony limit");
   });
 });
 
 describe("ERROR_LABELS", () => {
   it("maps known error codes to normalized labels", () => {
-    expect(ERROR_LABELS.rate_limit).toBe("rate limit");
-    expect(ERROR_LABELS.rate_limit_exceeded).toBe("rate limit");
-    expect(ERROR_LABELS.quota_exceeded).toBe("quota");
-    expect(ERROR_LABELS.insufficient_quota).toBe("quota");
+    expect(ERROR_LABELS.rate_limit).toBe("limit");
+    expect(ERROR_LABELS.rate_limit_exceeded).toBe("limit");
+    expect(ERROR_LABELS.quota_exceeded).toBe("limit");
+    expect(ERROR_LABELS.insufficient_quota).toBe("limit");
     expect(ERROR_LABELS.upstream_error).toBe("upstream");
   });
 });
 
 describe("ROUTING_LABELS", () => {
   it("contains supported routing labels", () => {
-    expect(ROUTING_LABELS.usage_weighted).toBe("usage weighted");
+    expect(ROUTING_LABELS.usage_weighted).toBe("ważone użyciem");
     expect(ROUTING_LABELS.round_robin).toBe("round robin");
     expect(ROUTING_LABELS.sticky).toBe("sticky");
   });
@@ -75,7 +75,7 @@ describe("MESSAGE_TONE_META", () => {
       "success",
       "warning",
     ]);
-    expect(MESSAGE_TONE_META.success.defaultTitle).toBe("Import complete");
+    expect(MESSAGE_TONE_META.success.defaultTitle).toBe("Import zakończony");
     expect(MESSAGE_TONE_META.error.className).toBe("deactivated");
   });
 });

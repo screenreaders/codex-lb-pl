@@ -73,9 +73,15 @@ export function MultiSelectFilter({ label, values, options, onChange }: MultiSel
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="sm" className="min-w-[7rem] justify-between gap-1.5">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="min-w-[7rem] justify-between gap-1.5"
+          aria-label={`Filtr ${label}: ${summary}`}
+        >
           {summary}
-          <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="max-h-80 min-w-56 overflow-y-auto">
@@ -110,7 +116,7 @@ export function MultiSelectFilter({ label, values, options, onChange }: MultiSel
                   }}
                   aria-label={`Usuń nieaktualne ${option.label}`}
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               ) : null}
             </DropdownMenuCheckboxItem>

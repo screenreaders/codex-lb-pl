@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -67,6 +67,9 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
   const initialLimitRules = useMemo(() => limitsToCreateRules(apiKey), [apiKey]);
   const [limitRules, setLimitRules] = useState<LimitRuleCreate[]>(() => initialLimitRules);
   const [expiresAt, setExpiresAt] = useState<Date | null>(() => parseDate(apiKey.expiresAt));
+  const modelsLabelId = useId();
+  const expiryLabelId = useId();
+  const limitsLabelId = useId();
 
   const handleSubmit = async (values: FormValues) => {
     const normalizedLimits = normalizeLimitRules(limitRules);
@@ -106,13 +109,13 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
             />
 
             <div className="space-y-1">
-              <label className="text-sm font-medium">Dozwolone modele</label>
-              <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} />
+              <p id={modelsLabelId} className="text-sm font-medium">Dozwolone modele</p>
+              <ModelMultiSelect value={selectedModels} onChange={setSelectedModels} ariaLabel="Dozwolone modele" />
             </div>
 
             <div className="space-y-1">
-              <label className="text-sm font-medium">Ważność</label>
-              <ExpiryPicker value={expiresAt} onChange={setExpiresAt} />
+              <p id={expiryLabelId} className="text-sm font-medium">Ważność</p>
+              <ExpiryPicker value={expiresAt} onChange={setExpiresAt} ariaLabel="Ważność klucza API" />
             </div>
 
             <FormField
@@ -121,7 +124,7 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
               render={({ field }) => (
                 <div className="flex items-center justify-between rounded-md border p-2">
                   <span className="text-sm">Aktywny</span>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch checked={field.value} onCheckedChange={field.onChange} aria-label="Aktywność klucza API" />
                 </div>
               )}
             />
@@ -129,8 +132,8 @@ function ApiKeyEditForm({ apiKey, busy, onSubmit, onClose }: ApiKeyEditFormProps
 
           {/* Right column — Limits */}
           <div className="max-h-[55vh] space-y-3 overflow-y-auto overscroll-contain pl-1 pr-2 max-sm:mt-3 max-sm:border-t max-sm:pt-3">
-            <h4 className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limity</h4>
-            <LimitRulesEditor rules={limitRules} onChange={setLimitRules} />
+            <h4 id={limitsLabelId} className="sticky top-0 bg-background pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Limity</h4>
+            <LimitRulesEditor rules={limitRules} onChange={setLimitRules} ariaLabel="Edytor limitów klucza API" />
 
             {apiKey.limits.length > 0 ? (
               <div className="space-y-1">
@@ -176,6 +179,11 @@ function LimitUsageBar({ limit }: { limit: ApiKey["limits"][number] }) {
       </div>
       <div className="mt-1 h-1.5 w-full rounded-full bg-muted">
         <div
+          role="progressbar"
+          aria-label={`Zużycie limitu ${typeLabel}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(percent)}
           className={`h-full rounded-full ${percent >= 90 ? "bg-destructive" : "bg-primary"}`}
           style={{ width: `${percent}%` }}
         />

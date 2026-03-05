@@ -63,13 +63,13 @@ describe("MultiSelectFilter", () => {
     expect(onChange).toHaveBeenCalledWith(["error"]);
   });
 
-  it("shows 'No options' when options array is empty", async () => {
+  it("shows 'Brak opcji' when options array is empty", async () => {
     const user = userEvent.setup();
     render(<MultiSelectFilter label="Status" values={[]} options={[]} onChange={vi.fn()} />);
 
     await user.click(screen.getByRole("button"));
 
-    expect(await screen.findByText("No options")).toBeInTheDocument();
+    expect(await screen.findByText("Brak opcji")).toBeInTheDocument();
   });
 
   it("renders stale selected values with a badge and allows toggling off", async () => {
@@ -86,7 +86,7 @@ describe("MultiSelectFilter", () => {
 
     await user.click(screen.getByRole("button"));
     expect(await screen.findByRole("menuitemcheckbox", { name: /unknown/i })).toBeInTheDocument();
-    expect(await screen.findByText("Stale")).toBeInTheDocument();
+    expect(await screen.findByText("Nieaktualne")).toBeInTheDocument();
 
     await user.click(await screen.findByRole("menuitemcheckbox", { name: /unknown/i }));
     expect(onChange).toHaveBeenCalledWith([]);
@@ -105,7 +105,7 @@ describe("MultiSelectFilter", () => {
     );
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByRole("button", { name: "Remove stale unknown" }));
+    await user.click(await screen.findByRole("button", { name: "Usuń nieaktualne unknown" }));
 
     expect(onChange).toHaveBeenCalledWith(["ok"]);
   });

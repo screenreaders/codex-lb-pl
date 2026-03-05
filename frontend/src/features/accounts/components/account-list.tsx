@@ -1,5 +1,5 @@
 import { Plus, Search, Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +41,9 @@ export function AccountList({
 }: AccountListProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const searchInputId = useId();
+  const statusFilterId = useId();
+  const resultCountId = useId();
 
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -65,8 +68,12 @@ export function AccountList({
     <div className="space-y-3">
       <div className="flex items-center gap-2">
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" aria-hidden />
+          <label htmlFor={searchInputId} className="sr-only">
+            Szukaj kont
+          </label>
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
           <Input
+            id={searchInputId}
             placeholder="Szukaj kont..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -74,7 +81,15 @@ export function AccountList({
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger size="sm" className="w-32 shrink-0">
+          <label htmlFor={statusFilterId} className="sr-only">
+            Filtr statusu kont
+          </label>
+          <SelectTrigger
+            id={statusFilterId}
+            size="sm"
+            className="w-32 shrink-0"
+            aria-label="Filtr statusu kont"
+          >
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
@@ -89,16 +104,24 @@ export function AccountList({
 
       <div className="flex gap-2">
         <Button type="button" size="sm" variant="outline" onClick={onOpenImport} className="h-8 flex-1 gap-1.5 text-xs">
-          <Upload className="h-3.5 w-3.5" />
+          <Upload className="h-3.5 w-3.5" aria-hidden="true" />
           Importuj
         </Button>
         <Button type="button" size="sm" onClick={onOpenOauth} className="h-8 flex-1 gap-1.5 text-xs">
-          <Plus className="h-3.5 w-3.5" />
+          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
           Dodaj konto
         </Button>
       </div>
 
-      <div className="max-h-[calc(100vh-16rem)] space-y-1 overflow-y-auto p-1">
+      <p id={resultCountId} className="sr-only" aria-live="polite" aria-atomic="true">
+        {`Liczba pasujących kont: ${filtered.length}.`}
+      </p>
+      <div
+        role="listbox"
+        aria-label="Lista kont"
+        aria-describedby={resultCountId}
+        className="max-h-[calc(100vh-16rem)] space-y-1 overflow-y-auto p-1"
+      >
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-center">
             <p className="text-sm font-medium text-muted-foreground">Brak pasujących kont</p>

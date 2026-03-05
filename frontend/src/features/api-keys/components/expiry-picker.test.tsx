@@ -6,10 +6,10 @@ import { describe, expect, it, vi } from "vitest";
 import { ExpiryPicker } from "./expiry-picker";
 
 describe("ExpiryPicker", () => {
-  it("shows 'No expiration' when value is null", () => {
+  it("shows 'Bez wygaśnięcia' when value is null", () => {
     render(<ExpiryPicker value={null} onChange={vi.fn()} />);
 
-    expect(screen.getByText("No expiration")).toBeInTheDocument();
+    expect(screen.getByText("Bez wygaśnięcia")).toBeInTheDocument();
   });
 
   it("shows formatted date for a custom value", () => {
@@ -21,14 +21,14 @@ describe("ExpiryPicker", () => {
     expect(screen.getByText(format(customDate, "yyyy-MM-dd"))).toBeInTheDocument();
   });
 
-  it("calls onChange with null when 'No expiration' is clicked", async () => {
+  it("calls onChange with null when 'Bez wygaśnięcia' is clicked", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
     const date = addDays(new Date(), 15);
     render(<ExpiryPicker value={date} onChange={onChange} />);
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByText("No expiration"));
+    await user.click(await screen.findByText("Bez wygaśnięcia"));
 
     expect(onChange).toHaveBeenCalledWith(null);
   });
@@ -39,7 +39,7 @@ describe("ExpiryPicker", () => {
     render(<ExpiryPicker value={null} onChange={onChange} />);
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByText("30 days"));
+    await user.click(await screen.findByText("30 dni"));
 
     expect(onChange).toHaveBeenCalledOnce();
     const called = onChange.mock.calls[0][0] as Date;
@@ -54,22 +54,22 @@ describe("ExpiryPicker", () => {
 
     await user.click(screen.getByRole("button"));
 
-    expect(await screen.findByText("1 day")).toBeInTheDocument();
-    expect(screen.getByText("7 days")).toBeInTheDocument();
-    expect(screen.getByText("30 days")).toBeInTheDocument();
-    expect(screen.getByText("90 days")).toBeInTheDocument();
-    expect(screen.getByText("1 year")).toBeInTheDocument();
-    expect(screen.getByText("Custom date...")).toBeInTheDocument();
+    expect(await screen.findByText("1 dzień")).toBeInTheDocument();
+    expect(screen.getByText("7 dni")).toBeInTheDocument();
+    expect(screen.getByText("30 dni")).toBeInTheDocument();
+    expect(screen.getByText("90 dni")).toBeInTheDocument();
+    expect(screen.getByText("1 rok")).toBeInTheDocument();
+    expect(screen.getByText("Data niestandardowa...")).toBeInTheDocument();
   });
 
-  it("shows calendar when 'Custom date...' is clicked", async () => {
+  it("shows calendar when 'Data niestandardowa...' is clicked", async () => {
     const user = userEvent.setup();
     render(<ExpiryPicker value={null} onChange={vi.fn()} />);
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByText("Custom date..."));
+    await user.click(await screen.findByText("Data niestandardowa..."));
 
-    expect(await screen.findByText(/Back to presets/)).toBeInTheDocument();
+    expect(await screen.findByText(/Wróć do presetów/)).toBeInTheDocument();
   });
 
   it("goes back to presets from calendar view", async () => {
@@ -77,20 +77,20 @@ describe("ExpiryPicker", () => {
     render(<ExpiryPicker value={null} onChange={vi.fn()} />);
 
     await user.click(screen.getByRole("button"));
-    await user.click(await screen.findByText("Custom date..."));
-    await user.click(await screen.findByText(/Back to presets/));
+    await user.click(await screen.findByText("Data niestandardowa..."));
+    await user.click(await screen.findByText(/Wróć do presetów/));
 
-    expect(await screen.findByText("1 day")).toBeInTheDocument();
+    expect(await screen.findByText("1 dzień")).toBeInTheDocument();
   });
 
-  it("shows multiple No expiration elements when popover open and value is null", async () => {
+  it("shows multiple Bez wygaśnięcia elements when popover open and value is null", async () => {
     const user = userEvent.setup();
     render(<ExpiryPicker value={null} onChange={vi.fn()} />);
 
     await user.click(screen.getByRole("button"));
 
-    // "No expiration" appears in both the trigger and the popover option
-    const allMatches = await screen.findAllByText("No expiration");
+    // "Bez wygaśnięcia" appears in both the trigger and the popover option
+    const allMatches = await screen.findAllByText("Bez wygaśnięcia");
     expect(allMatches.length).toBeGreaterThanOrEqual(2);
   });
 });
