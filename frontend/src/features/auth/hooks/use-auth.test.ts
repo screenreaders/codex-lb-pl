@@ -4,6 +4,7 @@ import {
   getAuthSession,
   loginPassword,
   logout as logoutRequest,
+  setupPassword as setupPasswordRequest,
   verifyTotp as verifyTotpRequest,
 } from "@/features/auth/api";
 import { useAuthStore } from "@/features/auth/hooks/use-auth";
@@ -13,11 +14,13 @@ vi.mock("@/features/auth/api", () => ({
   getAuthSession: vi.fn(),
   loginPassword: vi.fn(),
   logout: vi.fn(),
+  setupPassword: vi.fn(),
   verifyTotp: vi.fn(),
 }));
 
 const sessionBase: AuthSession = {
   authenticated: true,
+  passwordConfigured: true,
   passwordRequired: true,
   totpRequiredOnLogin: false,
   totpConfigured: true,
@@ -25,6 +28,7 @@ const sessionBase: AuthSession = {
 
 function resetAuthStore(): void {
   useAuthStore.setState({
+    passwordConfigured: false,
     passwordRequired: false,
     authenticated: false,
     totpRequiredOnLogin: false,
@@ -64,6 +68,18 @@ describe("useAuthStore actions", () => {
 
     const next = useAuthStore.getState();
     expect(loginPassword).toHaveBeenCalledWith({ password: "secret-pass" });
+    expect(next.authenticated).toBe(true);
+    expect(next.error).toBeNull();
+  });
+
+  it("setupPassword updates session state", async () => {
+    vi.mocked(setupPasswordRequest).mockResolvedValue(sessionBase);
+
+    await useAuthStore.getState().setupPassword("secret-pass");
+
+    const next = useAuthStore.getState();
+    expect(setupPasswordRequest).toHaveBeenCalledWith({ password: "secret-pass" });
+    expect(next.passwordConfigured).toBe(true);
     expect(next.authenticated).toBe(true);
     expect(next.error).toBeNull();
   });

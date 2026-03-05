@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const AuthSessionSchema = z.object({
   authenticated: z.boolean(),
+  passwordConfigured: z.boolean(),
   passwordRequired: z.boolean(),
   totpRequiredOnLogin: z.boolean(),
   totpConfigured: z.boolean(),

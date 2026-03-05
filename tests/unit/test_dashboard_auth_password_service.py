@@ -124,3 +124,31 @@ async def test_remove_password_clears_password_and_totp() -> None:
 
     with pytest.raises(PasswordNotConfiguredError):
         await service.verify_password("password123")
+
+
+@pytest.mark.asyncio
+async def test_get_session_state_requires_password_setup_when_unconfigured() -> None:
+    repository = _FakeRepository()
+    service = DashboardAuthService(repository, DashboardSessionStore())
+
+    session = await service.get_session_state(None)
+
+    assert session.password_configured is False
+    assert session.password_required is False
+    assert session.authenticated is False
+    assert session.totp_required_on_login is False
+
+
+@pytest.mark.asyncio
+async def test_get_session_state_includes_password_configuration_flag() -> None:
+    repository = _FakeRepository()
+    store = DashboardSessionStore()
+    service = DashboardAuthService(repository, store)
+    await service.setup_password("password123")
+
+    session_id = store.create(password_verified=True, totp_verified=False)
+    session = await service.get_session_state(session_id)
+
+    assert session.password_configured is True
+    assert session.password_required is True
+    assert session.authenticated is True

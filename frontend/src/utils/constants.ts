@@ -21,8 +21,8 @@ export const ERROR_LABELS = {
 
 export const ROUTING_LABELS = {
   usage_weighted: "ważone użyciem",
-  round_robin: "round robin",
-  sticky: "sticky",
+  round_robin: "cykliczne",
+  sticky: "lepki",
 } as const;
 
 export const KNOWN_PLAN_TYPES = new Set([

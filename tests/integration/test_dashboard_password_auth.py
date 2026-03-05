@@ -89,8 +89,9 @@ async def test_password_endpoints_setup_login_change_remove(async_client):
     session = await async_client.get("/api/dashboard-auth/session")
     assert session.status_code == 200
     session_payload = session.json()
+    assert session_payload["passwordConfigured"] is False
     assert session_payload["passwordRequired"] is False
-    assert session_payload["authenticated"] is True
+    assert session_payload["authenticated"] is False
     assert session_payload["totpRequiredOnLogin"] is False
 
 

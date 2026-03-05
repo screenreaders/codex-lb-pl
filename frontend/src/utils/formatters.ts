@@ -155,10 +155,10 @@ export function formatCachedTokensMeta(totalTokens: unknown, cachedInputTokens: 
   const total = toNumber(totalTokens);
   const cached = toNumber(cachedInputTokens);
   if (total === null || total <= 0 || cached === null || cached <= 0) {
-    return "Cache: --";
+    return "Pamięć podręczna: --";
   }
   const percent = Math.min(100, Math.max(0, (cached / total) * 100));
-  return `Cache: ${formatCompactNumber(cached)} (${Math.round(percent)}%)`;
+  return `Pamięć podręczna: ${formatCompactNumber(cached)} (${Math.round(percent)}%)`;
 }
 
 export function formatModelLabel(model: string | null | undefined, reasoningEffort: string | null | undefined): string {

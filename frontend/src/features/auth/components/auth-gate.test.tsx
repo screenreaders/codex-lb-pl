@@ -10,6 +10,7 @@ function setAuthState(
   useAuthStore.setState({
     initialized: true,
     loading: false,
+    passwordConfigured: true,
     passwordRequired: true,
     authenticated: false,
     totpRequiredOnLogin: false,
@@ -61,6 +62,27 @@ describe("AuthGate", () => {
     );
 
     expect(screen.getByText("Protected content")).toBeInTheDocument();
+    await waitFor(() => expect(refreshSession).toHaveBeenCalledTimes(1));
+  });
+
+  it("shows initial setup form when password is not configured", async () => {
+    const refreshSession = vi.fn().mockResolvedValue(undefined);
+    setAuthState({
+      refreshSession,
+      passwordConfigured: false,
+      passwordRequired: false,
+      authenticated: false,
+      totpRequiredOnLogin: false,
+    });
+
+    render(
+      <AuthGate>
+        <div>Protected content</div>
+      </AuthGate>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Skonfiguruj hasło administratora" })).toBeInTheDocument();
+    expect(screen.queryByText("Protected content")).not.toBeInTheDocument();
     await waitFor(() => expect(refreshSession).toHaveBeenCalledTimes(1));
   });
 

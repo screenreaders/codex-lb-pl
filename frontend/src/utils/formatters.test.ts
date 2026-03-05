@@ -80,8 +80,8 @@ describe("formatters", () => {
   it("formats token meta strings", () => {
     expect(formatTokensWithCached(1234, 200)).toContain("cache");
     expect(formatTokensWithCached(1234, 0)).not.toContain("cache");
-    expect(formatCachedTokensMeta(1000, 250)).toBe("Cache: 250 (25%)");
-    expect(formatCachedTokensMeta(0, 250)).toBe("Cache: --");
+    expect(formatCachedTokensMeta(1000, 250)).toBe("Pamięć podręczna: 250 (25%)");
+    expect(formatCachedTokensMeta(0, 250)).toBe("Pamięć podręczna: --");
   });
 
   it("formats model and datetime labels", () => {

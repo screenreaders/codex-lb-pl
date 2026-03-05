@@ -5,11 +5,13 @@ import {
   getAuthSession,
   loginPassword,
   logout as logoutRequest,
+  setupPassword as setupPasswordRequest,
   verifyTotp as verifyTotpRequest,
 } from "@/features/auth/api";
 import type { AuthSession } from "@/features/auth/schemas";
 
 type AuthState = {
+  passwordConfigured: boolean;
   passwordRequired: boolean;
   authenticated: boolean;
   totpRequiredOnLogin: boolean;
@@ -18,6 +20,7 @@ type AuthState = {
   initialized: boolean;
   error: string | null;
   refreshSession: () => Promise<AuthSession>;
+  setupPassword: (password: string) => Promise<AuthSession>;
   login: (password: string) => Promise<AuthSession>;
   logout: () => Promise<void>;
   verifyTotp: (code: string) => Promise<AuthSession>;
@@ -26,6 +29,7 @@ type AuthState = {
 
 function applySession(set: (next: Partial<AuthState>) => void, session: AuthSession): AuthSession {
   set({
+    passwordConfigured: session.passwordConfigured,
     passwordRequired: session.passwordRequired,
     authenticated: session.authenticated,
     totpRequiredOnLogin: session.totpRequiredOnLogin,
@@ -37,6 +41,7 @@ function applySession(set: (next: Partial<AuthState>) => void, session: AuthSess
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
+  passwordConfigured: false,
   passwordRequired: false,
   authenticated: false,
   totpRequiredOnLogin: false,
@@ -52,6 +57,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : "Nie udało się odświeżyć sesji",
+      });
+      throw error;
+    } finally {
+      set({ loading: false, initialized: true });
+    }
+  },
+  setupPassword: async (password) => {
+    set({ loading: true, error: null });
+    try {
+      const session = await setupPasswordRequest({ password });
+      return applySession(set, session);
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : "Nie udało się ustawić hasła",
       });
       throw error;
     } finally {

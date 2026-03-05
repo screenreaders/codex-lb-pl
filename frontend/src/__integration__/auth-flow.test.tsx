@@ -8,6 +8,44 @@ import { renderWithProviders } from "@/test/utils";
 import { server } from "@/test/mocks/server";
 
 describe("auth flow integration", () => {
+  it("flows from first-run password setup to dashboard", async () => {
+    const user = userEvent.setup({ delay: null });
+
+    server.use(
+      http.get("/api/dashboard-auth/session", () =>
+        HttpResponse.json({
+          authenticated: false,
+          passwordConfigured: false,
+          passwordRequired: false,
+          totpRequiredOnLogin: false,
+          totpConfigured: false,
+        }),
+      ),
+      http.post("/api/dashboard-auth/password/setup", () =>
+        HttpResponse.json({
+          authenticated: true,
+          passwordConfigured: true,
+          passwordRequired: true,
+          totpRequiredOnLogin: false,
+          totpConfigured: false,
+        }),
+      ),
+    );
+
+    window.history.pushState({}, "", "/dashboard");
+    renderWithProviders(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Skonfiguruj hasło administratora" }, { timeout: 5000 }),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("Hasło"), "secret-password");
+    await user.type(screen.getByLabelText("Powtórz hasło"), "secret-password");
+    await user.click(screen.getByRole("button", { name: "Zapisz hasło" }));
+
+    expect(await screen.findByText("Przegląd, stan kont i ostatnie logi żądań.", {}, { timeout: 5000 })).toBeInTheDocument();
+  });
+
   it("flows from login to totp to dashboard", async () => {
     const user = userEvent.setup({ delay: null });
 
@@ -15,6 +53,7 @@ describe("auth flow integration", () => {
       http.get("/api/dashboard-auth/session", () =>
         HttpResponse.json({
           authenticated: false,
+          passwordConfigured: true,
           passwordRequired: true,
           totpRequiredOnLogin: false,
           totpConfigured: true,
@@ -23,6 +62,7 @@ describe("auth flow integration", () => {
       http.post("/api/dashboard-auth/password/login", () =>
         HttpResponse.json({
           authenticated: false,
+          passwordConfigured: true,
           passwordRequired: true,
           totpRequiredOnLogin: true,
           totpConfigured: true,
@@ -31,6 +71,7 @@ describe("auth flow integration", () => {
       http.post("/api/dashboard-auth/totp/verify", () =>
         HttpResponse.json({
           authenticated: true,
+          passwordConfigured: true,
           passwordRequired: true,
           totpRequiredOnLogin: false,
           totpConfigured: true,

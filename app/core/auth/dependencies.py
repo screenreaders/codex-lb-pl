@@ -6,6 +6,7 @@ from fastapi import Request, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.clients.usage import UsageFetchError, fetch_usage
+from app.core.config.settings import get_settings
 from app.core.config.settings_cache import get_settings_cache
 from app.core.exceptions import DashboardAuthError, ProxyAuthError, ProxyUpstreamError
 from app.db.session import get_background_session
@@ -56,7 +57,16 @@ async def validate_proxy_api_key(
 
 
 async def validate_dashboard_session(request: Request) -> None:
+    app_settings = get_settings()
     settings = await get_settings_cache().get()
+    if app_settings.dashboard_require_password_setup and settings.password_hash is None:
+        if settings.totp_required_on_login:
+            logger.warning(
+                "dashboard_auth_migration_inconsistency password_hash is NULL"
+                " while totp_required_on_login=true metric=dashboard_auth_migration_inconsistency"
+            )
+        raise DashboardAuthError("Password setup is required", code="password_setup_required")
+
     requires_auth = settings.password_hash is not None or settings.totp_required_on_login
     if not requires_auth:
         return

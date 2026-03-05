@@ -377,6 +377,7 @@ export const handlers = [
   http.delete("/api/dashboard-auth/password", () => {
     state.authSession = createDashboardAuthSession({
       authenticated: false,
+      passwordConfigured: false,
       passwordRequired: false,
       totpRequiredOnLogin: false,
       totpConfigured: false,

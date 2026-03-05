@@ -5,6 +5,7 @@ from datetime import timedelta
 
 import pytest
 
+from app.core.config.settings import get_settings
 from app.core.config.settings_cache import get_settings_cache
 from app.core.crypto import TokenEncryptor
 from app.core.usage.models import UsagePayload
@@ -80,6 +81,27 @@ async def test_session_branch_allows_without_password_and_blocks_without_session
     assert login.status_code == 200
     allowed = await async_client.get("/api/settings")
     assert allowed.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_strict_password_setup_mode_blocks_dashboard_until_password_set(async_client, monkeypatch):
+    monkeypatch.setenv("CODEX_LB_DASHBOARD_REQUIRE_PASSWORD_SETUP", "true")
+    get_settings.cache_clear()
+    try:
+        blocked = await async_client.get("/api/settings")
+        assert blocked.status_code == 401
+        assert blocked.json()["error"]["code"] == "password_setup_required"
+
+        setup = await async_client.post(
+            "/api/dashboard-auth/password/setup",
+            json={"password": "password123"},
+        )
+        assert setup.status_code == 200
+
+        allowed = await async_client.get("/api/settings")
+        assert allowed.status_code == 200
+    finally:
+        get_settings.cache_clear()
 
 
 @pytest.mark.asyncio

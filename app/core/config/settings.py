@@ -77,6 +77,7 @@ class Settings(BaseSettings):
     model_registry_enabled: bool = True
     model_registry_refresh_interval_seconds: int = Field(default=300, gt=0)
     model_registry_client_version: str = "0.101.0"
+    dashboard_require_password_setup: bool = True
 
     @field_validator("database_url")
     @classmethod

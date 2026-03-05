@@ -4,14 +4,14 @@ import type { PropsWithChildren } from "react";
 import { CodexLogo } from "@/components/brand/codex-logo";
 import { SpinnerBlock } from "@/components/ui/spinner";
 import { LoginForm } from "@/features/auth/components/login-form";
+import { SetupPasswordForm } from "@/features/auth/components/setup-password-form";
 import { TotpDialog } from "@/features/auth/components/totp-dialog";
 import { useAuthStore } from "@/features/auth/hooks/use-auth";
 
 export function AuthGate({ children }: PropsWithChildren) {
   const refreshSessionStable = useAuthStore((state) => state.refreshSession);
   const initialized = useAuthStore((state) => state.initialized);
-  const loading = useAuthStore((state) => state.loading);
-  const passwordRequired = useAuthStore((state) => state.passwordRequired);
+  const passwordConfigured = useAuthStore((state) => state.passwordConfigured);
   const authenticated = useAuthStore((state) => state.authenticated);
   const totpRequiredOnLogin = useAuthStore((state) => state.totpRequiredOnLogin);
 
@@ -20,7 +20,7 @@ export function AuthGate({ children }: PropsWithChildren) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (!initialized && loading) {
+  if (!initialized) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <SpinnerBlock />
@@ -28,8 +28,8 @@ export function AuthGate({ children }: PropsWithChildren) {
     );
   }
 
-  if (passwordRequired && !authenticated) {
-    if (totpRequiredOnLogin) {
+  if (!passwordConfigured || !authenticated) {
+    if (passwordConfigured && totpRequiredOnLogin) {
       return <TotpDialog open />;
     }
     return (
@@ -51,7 +51,7 @@ export function AuthGate({ children }: PropsWithChildren) {
               <p className="mt-0.5 text-sm text-muted-foreground">Równoważenie obciążenia API</p>
             </div>
           </div>
-          <LoginForm />
+          {!passwordConfigured ? <SetupPasswordForm /> : <LoginForm />}
         </div>
       </div>
     );

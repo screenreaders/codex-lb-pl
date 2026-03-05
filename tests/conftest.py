@@ -17,6 +17,7 @@ os.environ["CODEX_LB_DATABASE_URL"] = f"sqlite+aiosqlite:///{TEST_DB_PATH}"
 os.environ["CODEX_LB_UPSTREAM_BASE_URL"] = "https://example.invalid/backend-api"
 os.environ["CODEX_LB_USAGE_REFRESH_ENABLED"] = "false"
 os.environ["CODEX_LB_MODEL_REGISTRY_ENABLED"] = "false"
+os.environ["CODEX_LB_DASHBOARD_REQUIRE_PASSWORD_SETUP"] = "false"
 
 from app.db.models import Base  # noqa: E402
 from app.db.session import engine  # noqa: E402
