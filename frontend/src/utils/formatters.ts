@@ -154,8 +154,8 @@ export function formatTokensWithCached(totalTokens: unknown, cachedInputTokens: 
 export function formatCachedTokensMeta(totalTokens: unknown, cachedInputTokens: unknown): string {
   const total = toNumber(totalTokens);
   const cached = toNumber(cachedInputTokens);
-  if (total === null || total <= 0 || cached === null || cached <= 0) {
-    return "Pamięć podręczna: --";
+  if (total === null || total <= 0 || cached === null || cached < 0) {
+    return "Pamięć podręczna: brak danych";
   }
   const percent = Math.min(100, Math.max(0, (cached / total) * 100));
   return `Pamięć podręczna: ${formatCompactNumber(cached)} (${Math.round(percent)}%)`;

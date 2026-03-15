@@ -31,34 +31,40 @@ function QuotaBar({
 }) {
   const clamped = percent === null ? 0 : Math.max(0, Math.min(100, percent));
   const hasPercent = percent !== null;
+  const percentLabel = formatPercentNullable(percent);
+  const srPercent = percentLabel === "--" ? "brak danych" : percentLabel;
+  const srLabel = `${label}. Pozostało ${srPercent}. Reset ${resetLabel}.`;
   return (
     <div className="space-y-1">
-      <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">{label}</span>
-        <span
-          className={cn(
-            "tabular-nums font-medium",
-            !hasPercent
-              ? "text-muted-foreground"
-              : clamped >= 70
-                ? "text-emerald-600 dark:text-emerald-400"
-                : clamped >= 30
-                  ? "text-amber-600 dark:text-amber-400"
-                  : "text-red-600 dark:text-red-400",
-          )}
-        >
-          {formatPercentNullable(percent)}
-        </span>
-      </div>
-      <div className={cn("h-1.5 w-full overflow-hidden rounded-full", quotaBarTrack(clamped))}>
-        <div
-          className={cn("h-full rounded-full transition-all duration-500 ease-out", quotaBarColor(clamped))}
-          style={{ width: `${clamped}%` }}
-        />
-      </div>
-      <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-        <Clock className="h-3 w-3 shrink-0" />
-        <span>{resetLabel}</span>
+      <span className="sr-only">{srLabel}</span>
+      <div aria-hidden="true">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">{label}</span>
+          <span
+            className={cn(
+              "tabular-nums font-medium",
+              !hasPercent
+                ? "text-muted-foreground"
+                : clamped >= 70
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : clamped >= 30
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-red-600 dark:text-red-400",
+            )}
+          >
+            {percentLabel}
+          </span>
+        </div>
+        <div className={cn("h-1.5 w-full overflow-hidden rounded-full", quotaBarTrack(clamped))}>
+          <div
+            className={cn("h-full rounded-full transition-all duration-500 ease-out", quotaBarColor(clamped))}
+            style={{ width: `${clamped}%` }}
+          />
+        </div>
+        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          <Clock className="h-3 w-3 shrink-0" />
+          <span>{resetLabel}</span>
+        </div>
       </div>
     </div>
   );

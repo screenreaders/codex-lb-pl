@@ -122,8 +122,9 @@ export function buildDashboardView(
   const trends = overview.trends;
   const requests7d = metrics?.requests7d ?? null;
   const errorRate7d = metrics?.errorRate7d ?? null;
+  const errorRateValue = errorRate7d ?? (requests7d === 0 ? 0 : null);
   const estimatedErrors =
-    requests7d === null || errorRate7d === null ? null : Math.round(errorRate7d * requests7d);
+    requests7d === null || errorRateValue === null ? null : Math.round(errorRateValue * requests7d);
 
   const stats: DashboardStat[] = [
     {
@@ -152,12 +153,12 @@ export function buildDashboardView(
     },
     {
       label: "Wskaźnik błędów",
-      value: formatRate(errorRate7d),
+      value: formatRate(errorRateValue),
       meta: metrics?.topError
         ? `Najczęstszy: ${metrics.topError}`
-        : requests7d && estimatedErrors !== null
-          ? `${formatCompactNumber(estimatedErrors)} błędów w 7d`
-          : "Brak danych",
+        : estimatedErrors === null
+          ? "Brak danych"
+          : `${formatCompactNumber(estimatedErrors)} błędów w 7d`,
       icon: AlertTriangle,
       trend: trendPointsToValues(trends.errorRate),
       trendColor: TREND_COLORS[3],

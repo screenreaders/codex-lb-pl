@@ -81,7 +81,8 @@ describe("formatters", () => {
     expect(formatTokensWithCached(1234, 200)).toContain("cache");
     expect(formatTokensWithCached(1234, 0)).not.toContain("cache");
     expect(formatCachedTokensMeta(1000, 250)).toBe("Pamięć podręczna: 250 (25%)");
-    expect(formatCachedTokensMeta(0, 250)).toBe("Pamięć podręczna: --");
+    expect(formatCachedTokensMeta(0, 250)).toBe("Pamięć podręczna: brak danych");
+    expect(formatCachedTokensMeta(1000, 0)).toBe("Pamięć podręczna: 0 (0%)");
   });
 
   it("formats model and datetime labels", () => {

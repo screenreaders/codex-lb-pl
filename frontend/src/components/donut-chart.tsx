@@ -26,9 +26,8 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
     color: item.color ?? palette[index % palette.length],
   }));
 
-  const usedSum = normalizedItems.reduce((acc, item) => acc + Math.max(0, item.value), 0);
-  const consumed = Math.max(0, total - usedSum);
-  const safeTotal = Math.max(0, total);
+  const remainingSum = normalizedItems.reduce((acc, item) => acc + Math.max(0, item.value), 0);
+  const consumed = Math.max(0, total - remainingSum);
 
   const chartData = [
     ...normalizedItems.map((item) => ({
@@ -42,6 +41,14 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
   ];
 
   const hasData = chartData.some((d) => d.value > 0);
+  const displayRemaining = hasData ? formatCompactNumber(remainingSum) : "--";
+  const chartSummary = [
+    title,
+    subtitle ? subtitle : null,
+    `Pozostało ${displayRemaining}`,
+  ]
+    .filter(Boolean)
+    .join(". ");
   if (!hasData) {
     chartData.length = 0;
     chartData.push({ name: "__empty__", value: 1, fill: consumedColor });
@@ -55,7 +62,11 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
       </div>
 
       <div className="flex items-center gap-6">
-        <div className="relative h-36 w-36 shrink-0 overflow-visible">
+        <div
+          className="relative h-36 w-36 shrink-0 overflow-visible"
+          role="img"
+          aria-label={chartSummary}
+        >
           <PieChart width={144} height={144} margin={{ top: 1, right: 1, bottom: 1, left: 1 }}>
             <Pie
               data={chartData}
@@ -77,17 +88,22 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
             </Pie>
           </PieChart>
           <div className="absolute inset-[18px] flex items-center justify-center rounded-full text-center pointer-events-none">
-            <div>
+            <div aria-hidden="true">
               <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">Pozostało</p>
-              <p className="text-base font-semibold tabular-nums">{formatCompactNumber(safeTotal)}</p>
+              <p className="text-base font-semibold tabular-nums">{displayRemaining}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex-1 space-y-2.5">
+        <ul className="flex-1 space-y-2.5" role="list">
           {normalizedItems.map((item, i) => (
-            <div key={item.label} className="animate-fade-in-up flex items-center justify-between gap-3 text-xs" style={{ animationDelay: `${i * 75}ms` }}>
-              <div className="flex min-w-0 items-center gap-2">
+            <li
+              key={item.label}
+              className="animate-fade-in-up flex items-center justify-between gap-3 text-xs"
+              style={{ animationDelay: `${i * 75}ms` }}
+            >
+              <span className="sr-only">{`${item.label}: ${formatCompactNumber(item.value)}`}</span>
+              <div className="flex min-w-0 items-center gap-2" aria-hidden="true">
                 <span
                   aria-hidden
                   className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -95,12 +111,12 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
                 />
                 <span className="truncate font-medium">{item.label}</span>
               </div>
-              <span className="tabular-nums text-muted-foreground">
+              <span className="tabular-nums text-muted-foreground" aria-hidden="true">
                 {formatCompactNumber(item.value)}
               </span>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );
