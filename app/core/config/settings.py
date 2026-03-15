@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     oauth_redirect_uri: str = "http://localhost:1455/auth/callback"
     oauth_callback_host: str = _default_oauth_callback_host()
     oauth_callback_port: int = 1455  # Do not change the port. OpenAI dislikes changes.
+    oauth_callback_always_on: bool = False
     token_refresh_timeout_seconds: float = 30.0
     token_refresh_interval_days: int = 8
     usage_fetch_timeout_seconds: float = 10.0
@@ -78,6 +79,7 @@ class Settings(BaseSettings):
     model_registry_refresh_interval_seconds: int = Field(default=300, gt=0)
     model_registry_client_version: str = "0.101.0"
     dashboard_require_password_setup: bool = True
+    routing_strategy: str = Field(default="usage_weighted")
 
     @field_validator("database_url")
     @classmethod
@@ -115,6 +117,17 @@ class Settings(BaseSettings):
                         normalized.append(host)
             return normalized
         raise TypeError("image_inline_allowed_hosts must be a list or comma-separated string")
+
+    @field_validator("routing_strategy", mode="before")
+    @classmethod
+    def _normalize_routing_strategy(cls, value: object) -> str:
+        if value is None:
+            return "usage_weighted"
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized in {"usage_weighted", "round_robin"}:
+                return normalized
+        return "usage_weighted"
 
 
 @lru_cache(maxsize=1)

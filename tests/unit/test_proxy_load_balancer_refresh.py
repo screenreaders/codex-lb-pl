@@ -89,6 +89,20 @@ class StubStickySessionsRepository:
         return None
 
 
+class MemoryStickySessionsRepository:
+    def __init__(self) -> None:
+        self._store: dict[str, str] = {}
+
+    async def get_account_id(self, key: str) -> str | None:
+        return self._store.get(key)
+
+    async def upsert(self, key: str, account_id: str) -> None:
+        self._store[key] = account_id
+
+    async def delete(self, key: str) -> None:
+        self._store.pop(key, None)
+
+
 @pytest.mark.asyncio
 async def test_select_account_skips_latest_primary_requery_when_not_refreshed(monkeypatch) -> None:
     async def stub_refresh_accounts(
@@ -146,3 +160,88 @@ async def test_select_account_skips_latest_primary_requery_when_not_refreshed(mo
     assert selection.account.id == account.id
     assert usage_repo.primary_calls == 1
     assert usage_repo.secondary_calls == 1
+
+
+@pytest.mark.asyncio
+async def test_select_account_round_robin_rotates_accounts(monkeypatch) -> None:
+    async def stub_refresh_accounts(
+        self,
+        accounts: list[Account],
+        latest_usage: dict[str, UsageHistory],
+    ) -> bool:
+        return False
+
+    monkeypatch.setattr(
+        "app.modules.proxy.load_balancer.UsageUpdater.refresh_accounts",
+        stub_refresh_accounts,
+    )
+
+    account_a = _make_account("acc-a", "a@example.com")
+    account_b = _make_account("acc-b", "b@example.com")
+    now = utcnow()
+    now_epoch = int(now.replace(tzinfo=timezone.utc).timestamp())
+    primary_a = UsageHistory(
+        id=1,
+        account_id=account_a.id,
+        recorded_at=now,
+        window="primary",
+        used_percent=10.0,
+        reset_at=now_epoch + 300,
+        window_minutes=5,
+    )
+    primary_b = UsageHistory(
+        id=2,
+        account_id=account_b.id,
+        recorded_at=now,
+        window="primary",
+        used_percent=20.0,
+        reset_at=now_epoch + 300,
+        window_minutes=5,
+    )
+    secondary_a = UsageHistory(
+        id=3,
+        account_id=account_a.id,
+        recorded_at=now,
+        window="secondary",
+        used_percent=10.0,
+        reset_at=now_epoch + 3600,
+        window_minutes=60,
+    )
+    secondary_b = UsageHistory(
+        id=4,
+        account_id=account_b.id,
+        recorded_at=now,
+        window="secondary",
+        used_percent=20.0,
+        reset_at=now_epoch + 3600,
+        window_minutes=60,
+    )
+
+    accounts_repo = StubAccountsRepository([account_b, account_a])
+    usage_repo = StubUsageRepository(
+        primary={account_a.id: primary_a, account_b.id: primary_b},
+        secondary={account_a.id: secondary_a, account_b.id: secondary_b},
+    )
+    sticky_repo = MemoryStickySessionsRepository()
+
+    @asynccontextmanager
+    async def repo_factory() -> AsyncIterator[ProxyRepositories]:
+        yield ProxyRepositories(
+            accounts=accounts_repo,  # type: ignore[arg-type]
+            usage=usage_repo,  # type: ignore[arg-type]
+            request_logs=object(),  # type: ignore[arg-type]
+            sticky_sessions=sticky_repo,  # type: ignore[arg-type]
+            api_keys=object(),  # type: ignore[arg-type]
+        )
+
+    balancer = LoadBalancer(repo_factory)
+    first = await balancer.select_account(routing_strategy="round_robin")
+    second = await balancer.select_account(routing_strategy="round_robin")
+    third = await balancer.select_account(routing_strategy="round_robin")
+
+    assert first.account is not None
+    assert second.account is not None
+    assert third.account is not None
+    assert first.account.id == "acc-a"
+    assert second.account.id == "acc-b"
+    assert third.account.id == "acc-a"

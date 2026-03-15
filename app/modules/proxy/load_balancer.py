@@ -8,6 +8,7 @@ from app.core import usage as usage_core
 from app.core.balancer import (
     AccountState,
     SelectionResult,
+    collect_available_states,
     handle_permanent_failure,
     handle_quota_exceeded,
     handle_rate_limit,
@@ -50,6 +51,7 @@ class LoadBalancer:
         *,
         reallocate_sticky: bool = False,
         prefer_earlier_reset_accounts: bool = False,
+        routing_strategy: str = "usage_weighted",
         model: str | None = None,
     ) -> AccountSelection:
         selected_snapshot: Account | None = None
@@ -83,6 +85,7 @@ class LoadBalancer:
                 sticky_key=sticky_key,
                 reallocate_sticky=reallocate_sticky,
                 prefer_earlier_reset_accounts=prefer_earlier_reset_accounts,
+                routing_strategy=routing_strategy,
                 sticky_repo=repos.sticky_sessions,
             )
             for state in states:
@@ -116,9 +119,12 @@ class LoadBalancer:
         sticky_key: str | None,
         reallocate_sticky: bool,
         prefer_earlier_reset_accounts: bool,
+        routing_strategy: str,
         sticky_repo: StickySessionsRepository | None,
     ) -> SelectionResult:
         if not sticky_key or not sticky_repo:
+            if routing_strategy == "round_robin":
+                return await self._select_round_robin(states, sticky_repo)
             return select_account(states, prefer_earlier_reset=prefer_earlier_reset_accounts)
 
         if reallocate_sticky:
@@ -141,6 +147,31 @@ class LoadBalancer:
         if chosen.account is not None and chosen.account.account_id in account_map:
             await sticky_repo.upsert(sticky_key, chosen.account.account_id)
         return chosen
+
+    async def _select_round_robin(
+        self,
+        states: list[AccountState],
+        sticky_repo: StickySessionsRepository | None,
+    ) -> SelectionResult:
+        available, error_message = collect_available_states(states)
+        if error_message:
+            return SelectionResult(None, error_message)
+
+        ordered = sorted(available, key=lambda state: state.account_id)
+        if not sticky_repo:
+            return SelectionResult(ordered[0], None)
+
+        rr_key = "__round_robin__"
+        last_id = await sticky_repo.get_account_id(rr_key)
+        ids = [state.account_id for state in ordered]
+        if last_id in ids:
+            next_index = (ids.index(last_id) + 1) % len(ids)
+        else:
+            next_index = 0
+
+        chosen = ordered[next_index]
+        await sticky_repo.upsert(rr_key, chosen.account_id)
+        return SelectionResult(chosen, None)
 
     async def mark_rate_limit(self, account: Account, error: UpstreamError) -> None:
         state = self._state_for(account)

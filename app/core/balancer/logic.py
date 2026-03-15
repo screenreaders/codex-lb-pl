@@ -48,6 +48,36 @@ def select_account(
     prefer_earlier_reset: bool = False,
 ) -> SelectionResult:
     current = now or time.time()
+    all_states = list(states)
+    available, error_message = collect_available_states(all_states, current)
+    if error_message:
+        return SelectionResult(None, error_message)
+
+    def _usage_sort_key(state: AccountState) -> tuple[float, float, float, str]:
+        primary_used = state.used_percent if state.used_percent is not None else 0.0
+        secondary_used = state.secondary_used_percent if state.secondary_used_percent is not None else primary_used
+        last_selected = state.last_selected_at or 0.0
+        return secondary_used, primary_used, last_selected, state.account_id
+
+    def _reset_first_sort_key(state: AccountState) -> tuple[int, float, float, float, str]:
+        reset_bucket_days = UNKNOWN_RESET_BUCKET_DAYS
+        if state.secondary_reset_at is not None:
+            reset_bucket_days = max(
+                0,
+                int((state.secondary_reset_at - current) // SECONDS_PER_DAY),
+            )
+        secondary_used, primary_used, last_selected, account_id = _usage_sort_key(state)
+        return reset_bucket_days, secondary_used, primary_used, last_selected, account_id
+
+    selected = min(available, key=_reset_first_sort_key if prefer_earlier_reset else _usage_sort_key)
+    return SelectionResult(selected, None)
+
+
+def collect_available_states(
+    states: Iterable[AccountState],
+    now: float | None = None,
+) -> tuple[list[AccountState], str | None]:
+    current = now or time.time()
     available: list[AccountState] = []
     all_states = list(states)
 
@@ -83,46 +113,33 @@ def select_account(
         available.append(state)
 
     if not available:
-        deactivated = [s for s in all_states if s.status == AccountStatus.DEACTIVATED]
-        paused = [s for s in all_states if s.status == AccountStatus.PAUSED]
-        rate_limited = [s for s in all_states if s.status == AccountStatus.RATE_LIMITED]
-        quota_exceeded = [s for s in all_states if s.status == AccountStatus.QUOTA_EXCEEDED]
+        return [], _unavailable_reason(all_states, current)
 
-        if paused and deactivated and not rate_limited and not quota_exceeded:
-            return SelectionResult(None, "All accounts are paused or require re-authentication")
-        if paused and not rate_limited and not quota_exceeded:
-            return SelectionResult(None, "All accounts are paused")
-        if deactivated and not rate_limited and not quota_exceeded:
-            return SelectionResult(None, "All accounts require re-authentication")
-        if quota_exceeded:
-            reset_candidates = [s.reset_at for s in quota_exceeded if s.reset_at]
-            if reset_candidates:
-                wait_seconds = max(0, min(reset_candidates) - int(current))
-                return SelectionResult(None, f"Rate limit exceeded. Try again in {wait_seconds:.0f}s")
-        cooldowns = [s.cooldown_until for s in all_states if s.cooldown_until and s.cooldown_until > current]
-        if cooldowns:
-            wait_seconds = max(0.0, min(cooldowns) - current)
-            return SelectionResult(None, f"Rate limit exceeded. Try again in {wait_seconds:.0f}s")
-        return SelectionResult(None, "No available accounts")
+    return available, None
 
-    def _usage_sort_key(state: AccountState) -> tuple[float, float, float, str]:
-        primary_used = state.used_percent if state.used_percent is not None else 0.0
-        secondary_used = state.secondary_used_percent if state.secondary_used_percent is not None else primary_used
-        last_selected = state.last_selected_at or 0.0
-        return secondary_used, primary_used, last_selected, state.account_id
 
-    def _reset_first_sort_key(state: AccountState) -> tuple[int, float, float, float, str]:
-        reset_bucket_days = UNKNOWN_RESET_BUCKET_DAYS
-        if state.secondary_reset_at is not None:
-            reset_bucket_days = max(
-                0,
-                int((state.secondary_reset_at - current) // SECONDS_PER_DAY),
-            )
-        secondary_used, primary_used, last_selected, account_id = _usage_sort_key(state)
-        return reset_bucket_days, secondary_used, primary_used, last_selected, account_id
+def _unavailable_reason(all_states: list[AccountState], current: float) -> str:
+    deactivated = [s for s in all_states if s.status == AccountStatus.DEACTIVATED]
+    paused = [s for s in all_states if s.status == AccountStatus.PAUSED]
+    rate_limited = [s for s in all_states if s.status == AccountStatus.RATE_LIMITED]
+    quota_exceeded = [s for s in all_states if s.status == AccountStatus.QUOTA_EXCEEDED]
 
-    selected = min(available, key=_reset_first_sort_key if prefer_earlier_reset else _usage_sort_key)
-    return SelectionResult(selected, None)
+    if paused and deactivated and not rate_limited and not quota_exceeded:
+        return "All accounts are paused or require re-authentication"
+    if paused and not rate_limited and not quota_exceeded:
+        return "All accounts are paused"
+    if deactivated and not rate_limited and not quota_exceeded:
+        return "All accounts require re-authentication"
+    if quota_exceeded:
+        reset_candidates = [s.reset_at for s in quota_exceeded if s.reset_at]
+        if reset_candidates:
+            wait_seconds = max(0, min(reset_candidates) - int(current))
+            return f"Rate limit exceeded. Try again in {wait_seconds:.0f}s"
+    cooldowns = [s.cooldown_until for s in all_states if s.cooldown_until and s.cooldown_until > current]
+    if cooldowns:
+        wait_seconds = max(0.0, min(cooldowns) - current)
+        return f"Rate limit exceeded. Try again in {wait_seconds:.0f}s"
+    return "No available accounts"
 
 
 def handle_rate_limit(state: AccountState, error: UpstreamError) -> None:
