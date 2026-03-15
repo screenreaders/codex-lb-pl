@@ -6,7 +6,17 @@ import { getDashboardOverview } from "@/features/dashboard/api";
 import { getSettings } from "@/features/settings/api";
 import { formatTimeLong } from "@/utils/formatters";
 
-function getRoutingLabel(sticky: boolean, preferEarlier: boolean): string {
+function getRoutingLabel(
+  routingStrategy: string | undefined,
+  sticky: boolean,
+  preferEarlier: boolean,
+): string {
+  if (routingStrategy === "round_robin") {
+    if (sticky && preferEarlier) return "Cykliczne + stałe przypisanie + preferowany wcześniejszy reset";
+    if (sticky) return "Cykliczne + stałe przypisanie";
+    if (preferEarlier) return "Cykliczne + preferowany wcześniejszy reset";
+    return "Cykliczne";
+  }
   if (sticky && preferEarlier) return "Stałe przypisanie + preferowany wcześniejszy reset";
   if (sticky) return "Stałe przypisanie";
   if (preferEarlier) return "Preferuj wcześniejszy reset";
@@ -38,7 +48,11 @@ export function StatusBar() {
   }, [lastSyncAt]);
 
   const routingLabel = settings
-    ? getRoutingLabel(settings.stickyThreadsEnabled, settings.preferEarlierResetAccounts)
+    ? getRoutingLabel(
+        settings.routingStrategy,
+        settings.stickyThreadsEnabled,
+        settings.preferEarlierResetAccounts,
+      )
     : "—";
   const liveLabel = isLive ? "Na żywo" : "Brak świeżej synchronizacji";
 

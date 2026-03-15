@@ -7,6 +7,7 @@ export const DashboardSettingsSchema = z.object({
   totpRequiredOnLogin: z.boolean(),
   totpConfigured: z.boolean(),
   apiKeyAuthEnabled: z.boolean(),
+  routingStrategy: z.string().optional(),
 });
 
 export const SettingsUpdateRequestSchema = z.object({

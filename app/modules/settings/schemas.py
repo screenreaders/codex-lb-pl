@@ -10,6 +10,7 @@ class DashboardSettingsResponse(DashboardModel):
     totp_required_on_login: bool
     totp_configured: bool
     api_key_auth_enabled: bool
+    routing_strategy: str
 
 
 class DashboardSettingsUpdateRequest(DashboardModel):

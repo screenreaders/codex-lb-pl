@@ -12,6 +12,11 @@
 
 - [x] 3.1 Add coverage for round-robin selection
 
-## 4. Spec Delta
+## 4. Dashboard Visibility
 
-- [ ] 4.1 Update relevant routing spec/context docs when available
+- [x] 4.1 Expose routing strategy in dashboard settings response
+- [x] 4.2 Show round-robin label in the status bar
+
+## 5. Spec Delta
+
+- [ ] 5.1 Update relevant routing spec/context docs when available
