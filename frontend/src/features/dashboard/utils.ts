@@ -120,12 +120,16 @@ export function buildDashboardView(
   const cost = overview.summary.cost.totalUsd7d;
   const secondaryLabel = formatWindowLabel("secondary", secondaryWindow?.windowMinutes ?? null);
   const trends = overview.trends;
+  const requests7d = metrics?.requests7d ?? null;
+  const errorRate7d = metrics?.errorRate7d ?? null;
+  const estimatedErrors =
+    requests7d === null || errorRate7d === null ? null : Math.round(errorRate7d * requests7d);
 
   const stats: DashboardStat[] = [
     {
       label: "Żądania (7d)",
-      value: formatCompactNumber(metrics?.requests7d ?? 0),
-      meta: `Śr./dzień ${formatCompactNumber(Math.round((metrics?.requests7d ?? 0) / 7))}`,
+      value: formatCompactNumber(requests7d ?? 0),
+      meta: `Śr./dzień ${formatCompactNumber(Math.round((requests7d ?? 0) / 7))}`,
       icon: Activity,
       trend: trendPointsToValues(trends.requests),
       trendColor: TREND_COLORS[0],
@@ -148,10 +152,12 @@ export function buildDashboardView(
     },
     {
       label: "Wskaźnik błędów",
-      value: formatRate(metrics?.errorRate7d ?? null),
+      value: formatRate(errorRate7d),
       meta: metrics?.topError
         ? `Najczęstszy: ${metrics.topError}`
-        : `~${formatCompactNumber(Math.round((metrics?.errorRate7d ?? 0) * (metrics?.requests7d ?? 0)))} błędów w 7d`,
+        : requests7d && estimatedErrors !== null
+          ? `${formatCompactNumber(estimatedErrors)} błędów w 7d`
+          : "Brak danych",
       icon: AlertTriangle,
       trend: trendPointsToValues(trends.errorRate),
       trendColor: TREND_COLORS[3],

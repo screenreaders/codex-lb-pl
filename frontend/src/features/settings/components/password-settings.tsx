@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { changePassword, removePassword, setupPassword } from "@/features/auth/api";
 import { useAuthStore } from "@/features/auth/hooks/use-auth";
 import {
@@ -174,7 +174,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                   <FormItem>
                     <FormLabel>Hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 znaków" />
+                      <PasswordInput {...field} autoComplete="new-password" placeholder="Min. 8 znaków" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -210,7 +210,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                   <FormItem>
                     <FormLabel>Obecne hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="current-password" />
+                      <PasswordInput {...field} autoComplete="current-password" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -223,7 +223,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                   <FormItem>
                     <FormLabel>Nowe hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="new-password" placeholder="Min. 8 znaków" />
+                      <PasswordInput {...field} autoComplete="new-password" placeholder="Min. 8 znaków" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -259,7 +259,7 @@ export function PasswordSettings({ disabled = false }: PasswordSettingsProps) {
                   <FormItem>
                     <FormLabel>Obecne hasło</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="current-password" placeholder="Wpisz obecne hasło" />
+                      <PasswordInput {...field} autoComplete="current-password" placeholder="Wpisz obecne hasło" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

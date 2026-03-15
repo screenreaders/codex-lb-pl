@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { AlertMessage } from "@/components/alert-message";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Spinner } from "@/components/ui/spinner";
 import { LoginRequestSchema } from "@/features/auth/schemas";
 import { useAuthStore } from "@/features/auth/hooks/use-auth";
@@ -41,19 +41,15 @@ export function LoginForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-medium">Hasło</FormLabel>
-                <div className="relative">
-                  <Lock className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="current-password"
-                      placeholder="Wpisz hasło"
-                      disabled={loading}
-                      className="pl-9"
-                    />
-                  </FormControl>
-                </div>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    autoComplete="current-password"
+                    placeholder="Wpisz hasło"
+                    disabled={loading}
+                    leftIcon={<Lock className="h-4 w-4" aria-hidden="true" />}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

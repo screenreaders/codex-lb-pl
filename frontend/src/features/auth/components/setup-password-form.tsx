@@ -6,7 +6,7 @@ import { z } from "zod";
 import { AlertMessage } from "@/components/alert-message";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuthStore } from "@/features/auth/hooks/use-auth";
 
@@ -64,19 +64,15 @@ export function SetupPasswordForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-medium">Hasło</FormLabel>
-                <div className="relative">
-                  <KeyRound className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="Min. 8 znaków"
-                      disabled={loading}
-                      className="pl-9"
-                    />
-                  </FormControl>
-                </div>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    autoComplete="new-password"
+                    placeholder="Min. 8 znaków"
+                    disabled={loading}
+                    leftIcon={<KeyRound className="h-4 w-4" aria-hidden="true" />}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -87,19 +83,15 @@ export function SetupPasswordForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="text-xs font-medium">Powtórz hasło</FormLabel>
-                <div className="relative">
-                  <KeyRound className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" aria-hidden="true" />
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="Powtórz hasło"
-                      disabled={loading}
-                      className="pl-9"
-                    />
-                  </FormControl>
-                </div>
+                <FormControl>
+                  <PasswordInput
+                    {...field}
+                    autoComplete="new-password"
+                    placeholder="Powtórz hasło"
+                    disabled={loading}
+                    leftIcon={<KeyRound className="h-4 w-4" aria-hidden="true" />}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
