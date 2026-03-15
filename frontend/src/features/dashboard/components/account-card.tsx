@@ -10,6 +10,7 @@ import {
   quotaBarColor,
   quotaBarTrack,
 } from "@/utils/account-status";
+import { STATUS_LABELS } from "@/utils/constants";
 import { formatPercentNullable, formatQuotaResetLabel } from "@/utils/formatters";
 
 type AccountAction = "details" | "resume" | "reauth";
@@ -72,6 +73,7 @@ function QuotaBar({
 
 export function AccountCard({ account, showAccountId = false, onAction }: AccountCardProps) {
   const status = normalizeStatus(account.status);
+  const statusLabel = STATUS_LABELS[status] ?? status;
   const primaryRemaining = account.usage?.primaryRemainingPercent ?? null;
   const secondaryRemaining = account.usage?.secondaryRemainingPercent ?? null;
   const weeklyOnly = account.windowMinutesPrimary == null && account.windowMinutesSecondary != null;
@@ -88,25 +90,42 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
   const heading = showAccountId && !emailSubtitle ? `${title} (${compactId})` : title;
   const subtitle = showAccountId && emailSubtitle ? `${emailSubtitle} | ID ${compactId}` : emailSubtitle;
 
+  const quotaSummary = (label: string, percent: number | null, resetLabel: string) => {
+    const percentLabel = formatPercentNullable(percent);
+    const srPercent = percentLabel === "--" ? "brak danych" : percentLabel;
+    return `${label}: pozostało ${srPercent}, reset ${resetLabel}.`;
+  };
+
+  const summaryParts = [heading];
+  if (subtitle) summaryParts.push(subtitle);
+  summaryParts.push(`Status: ${statusLabel}.`);
+  if (!weeklyOnly) summaryParts.push(quotaSummary("Główne", primaryRemaining, primaryReset));
+  summaryParts.push(quotaSummary("Wtórne", secondaryRemaining, secondaryReset));
+  const srSummary = summaryParts.join(" ");
+
   return (
     <div className="card-hover rounded-xl border bg-card p-4">
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-tight">{heading}</p>
-          {subtitle ? (
-            <p className="mt-0.5 truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
-              {subtitle}
-            </p>
-          ) : null}
-        </div>
-        <StatusBadge status={status} />
-      </div>
+      <p className="sr-only">{srSummary}</p>
 
-      {/* Quota bars */}
-      <div className={cn("mt-3.5 grid gap-3", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
-        {!weeklyOnly && <QuotaBar label="Główne" percent={primaryRemaining} resetLabel={primaryReset} />}
-        <QuotaBar label="Wtórne" percent={secondaryRemaining} resetLabel={secondaryReset} />
+      <div aria-hidden="true">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold leading-tight">{heading}</p>
+            {subtitle ? (
+              <p className="mt-0.5 truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
+                {subtitle}
+              </p>
+            ) : null}
+          </div>
+          <StatusBadge status={status} />
+        </div>
+
+        {/* Quota bars */}
+        <div className={cn("mt-3.5 grid gap-3", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
+          {!weeklyOnly && <QuotaBar label="Główne" percent={primaryRemaining} resetLabel={primaryReset} />}
+          <QuotaBar label="Wtórne" percent={secondaryRemaining} resetLabel={secondaryReset} />
+        </div>
       </div>
 
       {/* Actions */}
