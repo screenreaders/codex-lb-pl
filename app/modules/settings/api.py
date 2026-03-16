@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Body, Depends
 
 from app.core.auth.dependencies import set_dashboard_error_format, validate_dashboard_session
-from app.core.config.settings import get_settings
+from app.core.config.settings import get_settings as get_app_settings
 from app.core.config.settings_cache import get_settings_cache
 from app.core.exceptions import DashboardBadRequestError
 from app.dependencies import SettingsContext, get_settings_context
@@ -22,7 +22,7 @@ async def get_settings(
     context: SettingsContext = Depends(get_settings_context),
 ) -> DashboardSettingsResponse:
     settings = await context.service.get_settings()
-    app_settings = get_settings()
+    app_settings = get_app_settings()
     return DashboardSettingsResponse(
         sticky_threads_enabled=settings.sticky_threads_enabled,
         prefer_earlier_reset_accounts=settings.prefer_earlier_reset_accounts,
@@ -40,7 +40,7 @@ async def update_settings(
     context: SettingsContext = Depends(get_settings_context),
 ) -> DashboardSettingsResponse:
     current = await context.service.get_settings()
-    app_settings = get_settings()
+    app_settings = get_app_settings()
     try:
         updated = await context.service.update_settings(
             DashboardSettingsUpdateData(
