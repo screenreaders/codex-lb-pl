@@ -97,6 +97,15 @@ export function DashboardPage() {
     (optionsQuery.error instanceof Error && optionsQuery.error.message) ||
     null;
 
+  const primaryUsageByAccount = useMemo(() => {
+    const entries = overview?.windows.primary.accounts ?? [];
+    return Object.fromEntries(entries.map((entry) => [entry.accountId, entry]));
+  }, [overview?.windows.primary.accounts]);
+  const secondaryUsageByAccount = useMemo(() => {
+    const entries = overview?.windows.secondary?.accounts ?? [];
+    return Object.fromEntries(entries.map((entry) => [entry.accountId, entry]));
+  }, [overview?.windows.secondary?.accounts]);
+
   return (
     <div className="animate-fade-in-up space-y-8">
       {/* Page header */}
@@ -127,26 +136,43 @@ export function DashboardPage() {
         <>
           <StatsGrid stats={view.stats} />
 
-          <UsageDonuts
-            primaryItems={view.primaryUsageItems}
-            secondaryItems={view.secondaryUsageItems}
-            primaryTotal={overview?.summary.primaryWindow.capacityCredits ?? 0}
-            secondaryTotal={overview?.summary.secondaryWindow?.capacityCredits ?? 0}
-            primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
-            secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
-          />
-
-          <section className="space-y-4">
+          <section className="space-y-4" aria-labelledby="usage-section-title">
             <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Konta</h2>
+              <h2 id="usage-section-title" className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
+                Zużycie i limity
+              </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <AccountCards accounts={overview?.accounts ?? []} onAction={handleAccountAction} />
+            <UsageDonuts
+              primaryItems={view.primaryUsageItems}
+              secondaryItems={view.secondaryUsageItems}
+              primaryTotal={overview?.summary.primaryWindow.capacityCredits ?? 0}
+              secondaryTotal={overview?.summary.secondaryWindow?.capacityCredits ?? 0}
+              primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
+              secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
+            />
           </section>
 
-          <section className="space-y-4">
+          <section className="space-y-4" aria-labelledby="accounts-section-title">
             <div className="flex items-center gap-3">
-              <h2 className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">Logi żądań</h2>
+              <h2 id="accounts-section-title" className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
+                Konta
+              </h2>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <AccountCards
+              accounts={overview?.accounts ?? []}
+              primaryUsageByAccount={primaryUsageByAccount}
+              secondaryUsageByAccount={secondaryUsageByAccount}
+              onAction={handleAccountAction}
+            />
+          </section>
+
+          <section className="space-y-4" aria-labelledby="request-logs-section-title">
+            <div className="flex items-center gap-3">
+              <h2 id="request-logs-section-title" className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
+                Logi żądań
+              </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
             <RequestFilters

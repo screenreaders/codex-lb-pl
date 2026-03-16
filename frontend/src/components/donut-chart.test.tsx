@@ -21,7 +21,7 @@ describe("DonutChart", () => {
     expect(screen.getByText("Window 5h")).toBeInTheDocument();
     expect(screen.getByText("Account A")).toBeInTheDocument();
     expect(screen.getByText("Account B")).toBeInTheDocument();
-    expect(screen.getByText("Pozostało")).toBeInTheDocument();
+    expect(screen.getAllByText("Pozostało").length).toBeGreaterThan(0);
 
     const svg = container.querySelector("svg");
     expect(svg).not.toBeNull();
@@ -48,6 +48,6 @@ describe("DonutChart", () => {
 
     const svg = container.querySelector("svg");
     expect(svg).not.toBeNull();
-    expect(screen.getByText("Pozostało")).toBeInTheDocument();
+    expect(screen.getAllByText("Pozostało").length).toBeGreaterThan(0);
   });
 });

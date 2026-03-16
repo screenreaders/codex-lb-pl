@@ -11,30 +11,55 @@ import {
   quotaBarTrack,
 } from "@/utils/account-status";
 import { STATUS_LABELS } from "@/utils/constants";
-import { formatPercentNullable, formatQuotaResetLabel } from "@/utils/formatters";
+import { formatCompactNumber, formatPercentNullable, formatQuotaResetLabel } from "@/utils/formatters";
 
 type AccountAction = "details" | "resume" | "reauth";
 
 export type AccountCardProps = {
   account: AccountSummary;
   showAccountId?: boolean;
+  primaryUsage?: AccountWindowUsage;
+  secondaryUsage?: AccountWindowUsage;
   onAction?: (account: AccountSummary, action: AccountAction) => void;
+};
+
+export type AccountWindowUsage = {
+  remainingCredits: number;
+  capacityCredits: number;
+  remainingPercentAvg: number | null;
 };
 
 function QuotaBar({
   label,
   percent,
   resetLabel,
+  remainingCredits,
+  capacityCredits,
 }: {
   label: string;
   percent: number | null;
   resetLabel: string;
+  remainingCredits?: number;
+  capacityCredits?: number;
 }) {
   const clamped = percent === null ? 0 : Math.max(0, Math.min(100, percent));
   const hasPercent = percent !== null;
   const percentLabel = formatPercentNullable(percent);
   const srPercent = percentLabel === "--" ? "brak danych" : percentLabel;
-  const srLabel = `${label}. Pozostało ${srPercent}. Reset ${resetLabel}.`;
+  const hasCapacity = typeof capacityCredits === "number" && capacityCredits > 0;
+  const hasRemaining = typeof remainingCredits === "number" && remainingCredits > 0;
+  const creditsLabel = hasCapacity
+    ? `${formatCompactNumber(remainingCredits ?? 0)} / ${formatCompactNumber(capacityCredits)}`
+    : hasRemaining
+      ? `${formatCompactNumber(remainingCredits)}`
+      : null;
+  const displayLabel =
+    creditsLabel && percentLabel !== "--" ? `${creditsLabel} (${percentLabel})` : creditsLabel ?? percentLabel;
+  const srCredits =
+    creditsLabel && percentLabel !== "--"
+      ? `${creditsLabel} (${percentLabel})`
+      : creditsLabel ?? srPercent;
+  const srLabel = `${label}. Pozostało ${srCredits}. Reset ${resetLabel}.`;
   return (
     <div className="space-y-1">
       <span className="sr-only">{srLabel}</span>
@@ -53,7 +78,7 @@ function QuotaBar({
                     : "text-red-600 dark:text-red-400",
             )}
           >
-            {percentLabel}
+            {displayLabel}
           </span>
         </div>
         <div className={cn("h-1.5 w-full overflow-hidden rounded-full", quotaBarTrack(clamped))}>
@@ -71,11 +96,21 @@ function QuotaBar({
   );
 }
 
-export function AccountCard({ account, showAccountId = false, onAction }: AccountCardProps) {
+export function AccountCard({
+  account,
+  showAccountId = false,
+  primaryUsage,
+  secondaryUsage,
+  onAction,
+}: AccountCardProps) {
   const status = normalizeStatus(account.status);
   const statusLabel = STATUS_LABELS[status] ?? status;
   const primaryRemaining = account.usage?.primaryRemainingPercent ?? null;
   const secondaryRemaining = account.usage?.secondaryRemainingPercent ?? null;
+  const primaryRemainingCredits = primaryUsage?.remainingCredits;
+  const primaryCapacityCredits = primaryUsage?.capacityCredits;
+  const secondaryRemainingCredits = secondaryUsage?.remainingCredits;
+  const secondaryCapacityCredits = secondaryUsage?.capacityCredits;
   const weeklyOnly = account.windowMinutesPrimary == null && account.windowMinutesSecondary != null;
 
   const primaryReset = formatQuotaResetLabel(account.resetAtPrimary ?? null);
@@ -123,8 +158,22 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
 
         {/* Quota bars */}
         <div className={cn("mt-3.5 grid gap-3", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
-          {!weeklyOnly && <QuotaBar label="Główne" percent={primaryRemaining} resetLabel={primaryReset} />}
-          <QuotaBar label="Wtórne" percent={secondaryRemaining} resetLabel={secondaryReset} />
+          {!weeklyOnly && (
+            <QuotaBar
+              label="Główne"
+              percent={primaryRemaining}
+              resetLabel={primaryReset}
+              remainingCredits={primaryRemainingCredits}
+              capacityCredits={primaryCapacityCredits}
+            />
+          )}
+          <QuotaBar
+            label="Wtórne"
+            percent={secondaryRemaining}
+            resetLabel={secondaryReset}
+            remainingCredits={secondaryRemainingCredits}
+            capacityCredits={secondaryCapacityCredits}
+          />
         </div>
       </div>
 

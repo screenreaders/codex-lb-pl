@@ -107,30 +107,40 @@ export function DonutChart({
           </div>
         </div>
 
-        <ul className="flex-1 space-y-2.5" role="list">
-          {normalizedItems.map((item, i) => (
-            <li
-              key={item.label}
-              className="animate-fade-in-up flex items-center justify-between gap-3 text-xs"
-              style={{ animationDelay: `${i * 75}ms` }}
-            >
-              <span className="sr-only">{`${item.label}: ${
-                item.srValue ?? item.displayValue ?? formatValue(item.value)
-              }.`}</span>
-              <div className="flex min-w-0 items-center gap-2" aria-hidden="true">
-                <span
-                  aria-hidden
-                  className="h-2.5 w-2.5 shrink-0 rounded-full"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="truncate font-medium">{item.label}</span>
-              </div>
-              <span className="tabular-nums text-muted-foreground" aria-hidden="true">
-                {item.displayValue ?? formatValue(item.value)}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <table className="flex-1 w-full text-xs">
+          <thead className="sr-only">
+            <tr>
+              <th scope="col">Konto</th>
+              <th scope="col">Pozostało</th>
+            </tr>
+          </thead>
+          <tbody>
+            {normalizedItems.map((item, i) => (
+              <tr
+                key={item.label}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${i * 75}ms` }}
+              >
+                <td className="pr-3">
+                  <span className="sr-only">{`${item.label}: ${
+                    item.srValue ?? item.displayValue ?? formatValue(item.value)
+                  }.`}</span>
+                  <div className="flex min-w-0 items-center gap-2" aria-hidden="true">
+                    <span
+                      aria-hidden
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="truncate font-medium">{item.label}</span>
+                  </div>
+                </td>
+                <td className="text-right tabular-nums text-muted-foreground" aria-hidden="true">
+                  {item.displayValue ?? formatValue(item.value)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

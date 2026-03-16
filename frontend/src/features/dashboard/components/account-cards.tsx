@@ -2,16 +2,23 @@ import { useMemo } from "react";
 import { Users } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
-import { AccountCard, type AccountCardProps } from "@/features/dashboard/components/account-card";
+import { AccountCard, type AccountCardProps, type AccountWindowUsage } from "@/features/dashboard/components/account-card";
 import type { AccountSummary } from "@/features/dashboard/schemas";
 import { buildDuplicateAccountIdSet } from "@/utils/account-identifiers";
 
 export type AccountCardsProps = {
   accounts: AccountSummary[];
+  primaryUsageByAccount?: Record<string, AccountWindowUsage>;
+  secondaryUsageByAccount?: Record<string, AccountWindowUsage>;
   onAction?: AccountCardProps["onAction"];
 };
 
-export function AccountCards({ accounts, onAction }: AccountCardsProps) {
+export function AccountCards({
+  accounts,
+  primaryUsageByAccount,
+  secondaryUsageByAccount,
+  onAction,
+}: AccountCardsProps) {
   const duplicateAccountIds = useMemo(() => buildDuplicateAccountIdSet(accounts), [accounts]);
 
   if (accounts.length === 0) {
@@ -28,7 +35,13 @@ export function AccountCards({ accounts, onAction }: AccountCardsProps) {
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {accounts.map((account, index) => (
         <div key={account.accountId} className="animate-fade-in-up" style={{ animationDelay: `${index * 75}ms` }}>
-          <AccountCard account={account} showAccountId={duplicateAccountIds.has(account.accountId)} onAction={onAction} />
+          <AccountCard
+            account={account}
+            showAccountId={duplicateAccountIds.has(account.accountId)}
+            primaryUsage={primaryUsageByAccount?.[account.accountId]}
+            secondaryUsage={secondaryUsageByAccount?.[account.accountId]}
+            onAction={onAction}
+          />
         </div>
       ))}
     </div>
