@@ -25,7 +25,7 @@ function createWrapper(queryClient: QueryClient) {
 }
 
 describe("useDashboard", () => {
-  it("loads dashboard overview via MSW and configures 30s refetch", async () => {
+  it("loads dashboard overview via MSW and configures 60s refetch", async () => {
     const queryClient = createTestQueryClient();
     const { result } = renderHook(() => useDashboard(), {
       wrapper: createWrapper(queryClient),
@@ -39,7 +39,7 @@ describe("useDashboard", () => {
     const query = queryClient.getQueryCache().find({ queryKey: ["dashboard", "overview"] });
     const refetchInterval = (query?.options as { refetchInterval?: unknown } | undefined)
       ?.refetchInterval;
-    expect(refetchInterval).toBe(30_000);
+    expect(refetchInterval).toBe(60_000);
   });
 
   it("exposes error state on request failure", async () => {
