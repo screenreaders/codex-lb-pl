@@ -331,6 +331,7 @@ def _usage_entry_to_window_row(entry: UsageHistory) -> UsageWindowRow:
         reset_at=entry.reset_at,
         window_minutes=entry.window_minutes,
         recorded_at=entry.recorded_at,
+        credits_balance=entry.credits_balance,
     )
 
 

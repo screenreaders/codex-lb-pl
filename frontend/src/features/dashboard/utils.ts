@@ -24,6 +24,7 @@ export type RemainingItem = {
   label: string;
   value: number;
   remainingPercent: number | null;
+  capacityCredits: number;
   color: string;
 };
 
@@ -43,13 +44,23 @@ export type DashboardView = {
   requestLogs: RequestLog[];
 };
 
-function buildWindowIndex(window: UsageWindow | null): Map<string, number> {
-  const index = new Map<string, number>();
+type UsageWindowEntry = {
+  remainingCredits: number;
+  remainingPercentAvg: number | null;
+  capacityCredits: number;
+};
+
+function buildWindowIndex(window: UsageWindow | null): Map<string, UsageWindowEntry> {
+  const index = new Map<string, UsageWindowEntry>();
   if (!window) {
     return index;
   }
   for (const entry of window.accounts) {
-    index.set(entry.accountId, entry.remainingCredits);
+    index.set(entry.accountId, {
+      remainingCredits: entry.remainingCredits,
+      remainingPercentAvg: entry.remainingPercentAvg,
+      capacityCredits: entry.capacityCredits,
+    });
   }
   return index;
 }
@@ -80,7 +91,11 @@ export function buildRemainingItems(
       if (windowKey === "primary" && isWeeklyOnlyAccount(account)) {
         return null;
       }
-      const remaining = usageIndex.get(account.accountId) ?? 0;
+      const usageEntry = usageIndex.get(account.accountId);
+      const remaining = usageEntry?.remainingCredits ?? 0;
+      const remainingPercent =
+        usageEntry?.remainingPercentAvg ?? accountRemainingPercent(account, windowKey);
+      const capacityCredits = usageEntry?.capacityCredits ?? 0;
       const baseLabel = account.displayName || account.email || account.accountId;
       const label = duplicateAccountIds.has(account.accountId)
         ? `${baseLabel} (${formatCompactAccountId(account.accountId, 5, 4)})`
@@ -89,7 +104,8 @@ export function buildRemainingItems(
         accountId: account.accountId,
         label,
         value: remaining,
-        remainingPercent: accountRemainingPercent(account, windowKey),
+        remainingPercent,
+        capacityCredits,
         color: palette[index % palette.length],
       };
     })

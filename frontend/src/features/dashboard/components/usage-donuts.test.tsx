@@ -13,6 +13,7 @@ describe("UsageDonuts", () => {
             label: "primary@example.com",
             value: 120,
             remainingPercent: 60,
+            capacityCredits: 200,
             color: "#7bb661",
           },
         ]}
@@ -22,6 +23,7 @@ describe("UsageDonuts", () => {
             label: "secondary@example.com",
             value: 80,
             remainingPercent: 40,
+            capacityCredits: 200,
             color: "#d9a441",
           },
         ]}

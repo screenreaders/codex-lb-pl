@@ -227,14 +227,24 @@ def _build_account_history(
         if remaining_percent is None:
             remaining_percent = missing_remaining_percent
         capacity = usage_core.capacity_for_plan(account.plan_type, window)
+        credits_balance = usage.credits_balance if usage else None
         remaining_credits = usage_core.remaining_credits_from_percent(used_percent_value, capacity)
         if remaining_credits is None and missing_remaining_percent is not None:
             remaining_credits = capacity
+        capacity_value = float(capacity or 0.0)
+        if (
+            remaining_credits is None
+            and credits_balance is not None
+            and (capacity is None or capacity <= 0)
+        ):
+            balance_value = max(0.0, float(credits_balance))
+            remaining_credits = balance_value
+            capacity_value = balance_value
         results.append(
             UsageHistoryItem(
                 account_id=account_id,
                 remaining_percent_avg=remaining_percent,
-                capacity_credits=float(capacity or 0.0),
+                capacity_credits=capacity_value,
                 remaining_credits=float(remaining_credits or 0.0),
             )
         )

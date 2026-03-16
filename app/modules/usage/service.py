@@ -95,6 +95,7 @@ class UsageService:
                 reset_at=entry.reset_at,
                 window_minutes=entry.window_minutes,
                 recorded_at=entry.recorded_at,
+                credits_balance=entry.credits_balance,
             )
             for entry in latest.values()
         ]

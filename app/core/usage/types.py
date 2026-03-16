@@ -11,6 +11,7 @@ class UsageWindowRow:
     reset_at: int | None = None
     window_minutes: int | None = None
     recorded_at: datetime | None = None
+    credits_balance: float | None = None
 
 
 @dataclass(frozen=True)

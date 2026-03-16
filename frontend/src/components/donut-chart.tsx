@@ -8,6 +8,8 @@ export type DonutChartItem = {
   label: string;
   value: number;
   color?: string;
+  displayValue?: string;
+  srValue?: string;
 };
 
 export type DonutChartProps = {
@@ -15,9 +17,18 @@ export type DonutChartProps = {
   total: number;
   title: string;
   subtitle?: string;
+  valueFormatter?: (value: number) => string;
+  summaryText?: string;
 };
 
-export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
+export function DonutChart({
+  items,
+  total,
+  title,
+  subtitle,
+  valueFormatter,
+  summaryText,
+}: DonutChartProps) {
   const isDark = useThemeStore((s) => s.theme === "dark");
   const consumedColor = isDark ? "#404040" : "#d3d3d3";
   const palette = buildDonutPalette(items.length, isDark);
@@ -25,6 +36,7 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
     ...item,
     color: item.color ?? palette[index % palette.length],
   }));
+  const formatValue = valueFormatter ?? formatCompactNumber;
 
   const remainingSum = normalizedItems.reduce((acc, item) => acc + Math.max(0, item.value), 0);
   const consumed = Math.max(0, total - remainingSum);
@@ -41,7 +53,7 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
   ];
 
   const hasData = chartData.some((d) => d.value > 0);
-  const displayRemaining = hasData ? formatCompactNumber(remainingSum) : "--";
+  const displayRemaining = summaryText ?? (hasData ? formatValue(remainingSum) : "--");
   const chartSummary = [
     title,
     subtitle ? subtitle : null,
@@ -102,7 +114,9 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
               className="animate-fade-in-up flex items-center justify-between gap-3 text-xs"
               style={{ animationDelay: `${i * 75}ms` }}
             >
-              <span className="sr-only">{`${item.label}: ${formatCompactNumber(item.value)}`}</span>
+              <span className="sr-only">{`${item.label}: ${
+                item.srValue ?? item.displayValue ?? formatValue(item.value)
+              }.`}</span>
               <div className="flex min-w-0 items-center gap-2" aria-hidden="true">
                 <span
                   aria-hidden
@@ -112,7 +126,7 @@ export function DonutChart({ items, total, title, subtitle }: DonutChartProps) {
                 <span className="truncate font-medium">{item.label}</span>
               </div>
               <span className="tabular-nums text-muted-foreground" aria-hidden="true">
-                {formatCompactNumber(item.value)}
+                {item.displayValue ?? formatValue(item.value)}
               </span>
             </li>
           ))}
