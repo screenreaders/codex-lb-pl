@@ -27,7 +27,7 @@ export function StatusBar() {
   const { data: lastSyncAt = null } = useQuery({
     queryKey: ["dashboard", "overview"],
     queryFn: getDashboardOverview,
-    refetchInterval: 60_000,
+    refetchInterval: 120_000,
     refetchIntervalInBackground: false,
     select: (data) => data.lastSyncAt,
   });

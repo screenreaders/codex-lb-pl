@@ -1,6 +1,6 @@
 ## 1. Reduce Polling Pressure
 
-- [x] 1.1 Increase polling intervals to 60s for dashboard, logs, and accounts list
+- [x] 1.1 Increase polling intervals to 120s for dashboard, logs, and accounts list
 - [x] 1.2 Add `staleTime` and disable focus refetch for high-churn queries
 
 ## 2. Tests

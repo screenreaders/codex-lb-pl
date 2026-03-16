@@ -4,7 +4,7 @@ The dashboard polls multiple endpoints every 30 seconds. On busy or remote deplo
 
 ## What Changes
 
-- Increase dashboard polling intervals from 30s to 60s.
+- Increase dashboard polling intervals from 30s to 120s.
 - Add `staleTime` so window focus does not trigger redundant refetches inside the polling window.
 - Disable `refetchOnWindowFocus` for high-churn endpoints (dashboard overview, request logs, accounts list).
 

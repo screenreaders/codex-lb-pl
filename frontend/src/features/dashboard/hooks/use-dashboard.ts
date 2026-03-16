@@ -6,9 +6,9 @@ export function useDashboard() {
   return useQuery({
     queryKey: ["dashboard", "overview"],
     queryFn: getDashboardOverview,
-    refetchInterval: 60_000,
+    refetchInterval: 120_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    staleTime: 120_000,
   });
 }

@@ -109,20 +109,20 @@ export function useRequestLogs() {
   const logsQuery = useQuery({
     queryKey: ["dashboard", "request-logs", listFilters],
     queryFn: () => getRequestLogs(listFilters),
-    refetchInterval: 60_000,
+    refetchInterval: 120_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    staleTime: 120_000,
     placeholderData: keepPreviousData,
   });
 
   const optionsQuery = useQuery({
     queryKey: ["dashboard", "request-log-options", facetFilters],
     queryFn: () => getRequestLogOptions(facetFilters),
-    refetchInterval: 60_000,
+    refetchInterval: 120_000,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 60_000,
+    staleTime: 120_000,
   });
 
   const updateFilters = (patch: Partial<FilterState>) => {
