@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getDashboardOverview } from "@/features/dashboard/api";
 import { getSettings } from "@/features/settings/api";
+import { useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 import { formatTimeLong } from "@/utils/formatters";
 
 function getRoutingLabel(
@@ -24,11 +25,15 @@ function getRoutingLabel(
 }
 
 export function StatusBar() {
+  const refreshInterval = useRefreshIntervalStore((s) => s.interval);
+
   const { data: lastSyncAt = null } = useQuery({
     queryKey: ["dashboard", "overview"],
     queryFn: getDashboardOverview,
-    refetchInterval: 120_000,
+    refetchInterval: refreshInterval,
     refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: refreshInterval,
     select: (data) => data.lastSyncAt,
   });
 

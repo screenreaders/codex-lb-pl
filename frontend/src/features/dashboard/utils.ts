@@ -7,6 +7,7 @@ import {
   formatCachedTokensMeta,
   formatCompactNumber,
   formatCurrency,
+  formatPercentNullable,
   formatRate,
   formatWindowLabel,
 } from "@/utils/formatters";
@@ -43,6 +44,40 @@ export type DashboardView = {
   secondaryUsageItems: RemainingItem[];
   requestLogs: RequestLog[];
 };
+
+export type UsageDisplay = {
+  display: string;
+  srValue: string;
+};
+
+export function formatUsageDisplay({
+  remainingCredits,
+  capacityCredits,
+  remainingPercent,
+}: {
+  remainingCredits: number | undefined;
+  capacityCredits: number | undefined;
+  remainingPercent: number | null;
+}): UsageDisplay {
+  const percentLabel = formatPercentNullable(remainingPercent);
+  const hasCapacity = typeof capacityCredits === "number" && capacityCredits > 0;
+  const hasRemaining = typeof remainingCredits === "number" && remainingCredits > 0;
+  const creditsLabel = hasCapacity
+    ? `${formatCompactNumber(remainingCredits ?? 0)} / ${formatCompactNumber(capacityCredits)}`
+    : hasRemaining
+      ? `${formatCompactNumber(remainingCredits)}`
+      : null;
+  const display =
+    creditsLabel && percentLabel !== "--" ? `${creditsLabel} (${percentLabel})` : creditsLabel ?? percentLabel;
+  const srValue = creditsLabel
+    ? percentLabel !== "--"
+      ? `${creditsLabel} kredytów, ${percentLabel}`
+      : `${creditsLabel} kredytów`
+    : percentLabel === "--"
+      ? "brak danych"
+      : percentLabel;
+  return { display, srValue };
+}
 
 type UsageWindowEntry = {
   remainingCredits: number;

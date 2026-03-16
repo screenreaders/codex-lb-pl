@@ -9,6 +9,7 @@ import {
   pauseAccount,
   reactivateAccount,
 } from "@/features/accounts/api";
+import { useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 
 function invalidateAccountRelatedQueries(queryClient: ReturnType<typeof useQueryClient>) {
   void queryClient.invalidateQueries({ queryKey: ["accounts", "list"] });
@@ -82,14 +83,16 @@ export function useAccountTrends(accountId: string | null) {
 }
 
 export function useAccounts() {
+  const refreshInterval = useRefreshIntervalStore((s) => s.interval);
+
   const accountsQuery = useQuery({
     queryKey: ["accounts", "list"],
     queryFn: listAccounts,
     select: (data) => data.accounts,
-    refetchInterval: 120_000,
+    refetchInterval: refreshInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 120_000,
+    staleTime: refreshInterval,
   });
 
   const mutations = useAccountMutations();

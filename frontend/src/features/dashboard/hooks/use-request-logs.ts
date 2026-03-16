@@ -9,6 +9,7 @@ import {
   type RequestLogsListFilters,
 } from "@/features/dashboard/api";
 import { FilterStateSchema, type FilterState } from "@/features/dashboard/schemas";
+import { useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 
 const DEFAULT_FILTER_STATE: FilterState = {
   search: "",
@@ -82,6 +83,7 @@ function timeframeToSinceIso(timeframe: FilterState["timeframe"]): string | unde
 
 export function useRequestLogs() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const refreshInterval = useRefreshIntervalStore((s) => s.interval);
 
   const filters = useMemo(() => parseFilterState(searchParams), [searchParams]);
   const since = useMemo(() => timeframeToSinceIso(filters.timeframe), [filters.timeframe]);
@@ -109,20 +111,20 @@ export function useRequestLogs() {
   const logsQuery = useQuery({
     queryKey: ["dashboard", "request-logs", listFilters],
     queryFn: () => getRequestLogs(listFilters),
-    refetchInterval: 120_000,
+    refetchInterval: refreshInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 120_000,
+    staleTime: refreshInterval,
     placeholderData: keepPreviousData,
   });
 
   const optionsQuery = useQuery({
     queryKey: ["dashboard", "request-log-options", facetFilters],
     queryFn: () => getRequestLogOptions(facetFilters),
-    refetchInterval: 120_000,
+    refetchInterval: refreshInterval,
     refetchIntervalInBackground: false,
     refetchOnWindowFocus: false,
-    staleTime: 120_000,
+    staleTime: refreshInterval,
   });
 
   const updateFilters = (patch: Partial<FilterState>) => {

@@ -5,6 +5,7 @@ import { createElement, type PropsWithChildren } from "react";
 import { describe, expect, it } from "vitest";
 
 import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
+import { useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 import { server } from "@/test/mocks/server";
 
 function createTestQueryClient(): QueryClient {
@@ -25,7 +26,7 @@ function createWrapper(queryClient: QueryClient) {
 }
 
 describe("useDashboard", () => {
-  it("loads dashboard overview via MSW and configures 120s refetch", async () => {
+  it("loads dashboard overview via MSW and configures refresh interval", async () => {
     const queryClient = createTestQueryClient();
     const { result } = renderHook(() => useDashboard(), {
       wrapper: createWrapper(queryClient),
@@ -39,7 +40,7 @@ describe("useDashboard", () => {
     const query = queryClient.getQueryCache().find({ queryKey: ["dashboard", "overview"] });
     const refetchInterval = (query?.options as { refetchInterval?: unknown } | undefined)
       ?.refetchInterval;
-    expect(refetchInterval).toBe(120_000);
+    expect(refetchInterval).toBe(useRefreshIntervalStore.getState().interval);
   });
 
   it("exposes error state on request failure", async () => {

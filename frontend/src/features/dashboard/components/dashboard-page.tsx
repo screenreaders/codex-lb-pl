@@ -4,7 +4,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
 import { AlertMessage } from "@/components/alert-message";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAccountMutations } from "@/features/accounts/hooks/use-accounts";
+import { AccountsSummaryTable } from "@/features/dashboard/components/accounts-summary-table";
 import { AccountCards } from "@/features/dashboard/components/account-cards";
 import { DashboardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { RequestFilters } from "@/features/dashboard/components/filters/request-filters";
@@ -15,6 +17,7 @@ import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
 import { useRequestLogs } from "@/features/dashboard/hooks/use-request-logs";
 import { buildDashboardView } from "@/features/dashboard/utils";
 import type { AccountSummary } from "@/features/dashboard/schemas";
+import { isRefreshIntervalValue, REFRESH_INTERVAL_OPTIONS, useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 import { useThemeStore } from "@/hooks/use-theme";
 import { REQUEST_STATUS_LABELS } from "@/utils/constants";
 import { formatModelLabel, formatSlug } from "@/utils/formatters";
@@ -25,6 +28,8 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isDark = useThemeStore((s) => s.theme === "dark");
+  const refreshInterval = useRefreshIntervalStore((s) => s.interval);
+  const setRefreshInterval = useRefreshIntervalStore((s) => s.setInterval);
   const dashboardQuery = useDashboard();
   const { filters, logsQuery, optionsQuery, updateFilters } = useRequestLogs();
   const { resumeMutation } = useAccountMutations();
@@ -34,6 +39,19 @@ export function DashboardPage() {
   const handleRefresh = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ["dashboard"] });
   }, [queryClient]);
+
+  const handleRefreshIntervalChange = useCallback(
+    (value: string) => {
+      const parsed = Number(value);
+      if (!Number.isFinite(parsed)) {
+        return;
+      }
+      if (isRefreshIntervalValue(parsed)) {
+        setRefreshInterval(parsed);
+      }
+    },
+    [setRefreshInterval],
+  );
 
   const handleAccountAction = useCallback(
     (account: AccountSummary, action: string) => {
@@ -109,23 +127,38 @@ export function DashboardPage() {
   return (
     <div className="animate-fade-in-up space-y-8">
       {/* Page header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Panel</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Przegląd, stan kont i ostatnie logi żądań.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleRefresh}
-          disabled={isRefreshing}
-          aria-label="Odśwież panel"
-          className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-          title="Odśwież panel"
-        >
-          <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} aria-hidden="true" />
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="hidden text-xs text-muted-foreground sm:inline">Auto odświeżanie</span>
+          <Select value={String(refreshInterval)} onValueChange={handleRefreshIntervalChange}>
+            <SelectTrigger size="sm" className="w-[140px]" aria-label="Częstotliwość odświeżania danych">
+              <SelectValue placeholder="Odświeżanie" />
+            </SelectTrigger>
+            <SelectContent align="end">
+              {REFRESH_INTERVAL_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={String(option.value)}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            aria-label="Odśwież panel"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+            title="Odśwież panel"
+          >
+            <RefreshCw className={`h-4 w-4${isRefreshing ? " animate-spin" : ""}`} aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {errorMessage ? <AlertMessage variant="error">{errorMessage}</AlertMessage> : null}
@@ -134,7 +167,15 @@ export function DashboardPage() {
         <DashboardSkeleton />
       ) : (
         <>
-          <StatsGrid stats={view.stats} />
+          <section className="space-y-4" aria-labelledby="summary-section-title">
+            <div className="flex items-center gap-3">
+              <h2 id="summary-section-title" className="text-[13px] font-medium uppercase tracking-wider text-muted-foreground">
+                Podsumowanie
+              </h2>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <StatsGrid stats={view.stats} />
+          </section>
 
           <section className="space-y-4" aria-labelledby="usage-section-title">
             <div className="flex items-center gap-3">
@@ -160,12 +201,27 @@ export function DashboardPage() {
               </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <AccountCards
-              accounts={overview?.accounts ?? []}
-              primaryUsageByAccount={primaryUsageByAccount}
-              secondaryUsageByAccount={secondaryUsageByAccount}
-              onAction={handleAccountAction}
-            />
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Podsumowanie kont</h3>
+                <AccountsSummaryTable
+                  accounts={overview?.accounts ?? []}
+                  primaryUsageByAccount={primaryUsageByAccount}
+                  secondaryUsageByAccount={secondaryUsageByAccount}
+                  primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
+                  secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
+                />
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karty kont</h3>
+                <AccountCards
+                  accounts={overview?.accounts ?? []}
+                  primaryUsageByAccount={primaryUsageByAccount}
+                  secondaryUsageByAccount={secondaryUsageByAccount}
+                  onAction={handleAccountAction}
+                />
+              </div>
+            </div>
           </section>
 
           <section className="space-y-4" aria-labelledby="request-logs-section-title">

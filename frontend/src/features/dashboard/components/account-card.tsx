@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { cn } from "@/lib/utils";
 import type { AccountSummary } from "@/features/dashboard/schemas";
+import { formatUsageDisplay, type UsageDisplay } from "@/features/dashboard/utils";
 import { formatCompactAccountId } from "@/utils/account-identifiers";
 import {
   normalizeStatus,
@@ -11,7 +12,7 @@ import {
   quotaBarTrack,
 } from "@/utils/account-status";
 import { STATUS_LABELS } from "@/utils/constants";
-import { formatCompactNumber, formatPercentNullable, formatQuotaResetLabel } from "@/utils/formatters";
+import { formatQuotaResetLabel } from "@/utils/formatters";
 
 type AccountAction = "details" | "resume" | "reauth";
 
@@ -33,33 +34,17 @@ function QuotaBar({
   label,
   percent,
   resetLabel,
-  remainingCredits,
-  capacityCredits,
+  usageDisplay,
 }: {
   label: string;
   percent: number | null;
   resetLabel: string;
-  remainingCredits?: number;
-  capacityCredits?: number;
+  usageDisplay: UsageDisplay;
 }) {
   const clamped = percent === null ? 0 : Math.max(0, Math.min(100, percent));
   const hasPercent = percent !== null;
-  const percentLabel = formatPercentNullable(percent);
-  const srPercent = percentLabel === "--" ? "brak danych" : percentLabel;
-  const hasCapacity = typeof capacityCredits === "number" && capacityCredits > 0;
-  const hasRemaining = typeof remainingCredits === "number" && remainingCredits > 0;
-  const creditsLabel = hasCapacity
-    ? `${formatCompactNumber(remainingCredits ?? 0)} / ${formatCompactNumber(capacityCredits)}`
-    : hasRemaining
-      ? `${formatCompactNumber(remainingCredits)}`
-      : null;
-  const displayLabel =
-    creditsLabel && percentLabel !== "--" ? `${creditsLabel} (${percentLabel})` : creditsLabel ?? percentLabel;
-  const srCredits =
-    creditsLabel && percentLabel !== "--"
-      ? `${creditsLabel} (${percentLabel})`
-      : creditsLabel ?? srPercent;
-  const srLabel = `${label}. Pozostało ${srCredits}. Reset ${resetLabel}.`;
+  const displayLabel = usageDisplay.display;
+  const srLabel = `${label}. Pozostało ${usageDisplay.srValue}. Reset ${resetLabel}.`;
   return (
     <div className="space-y-1">
       <span className="sr-only">{srLabel}</span>
@@ -115,6 +100,16 @@ export function AccountCard({
 
   const primaryReset = formatQuotaResetLabel(account.resetAtPrimary ?? null);
   const secondaryReset = formatQuotaResetLabel(account.resetAtSecondary ?? null);
+  const primaryUsageDisplay = formatUsageDisplay({
+    remainingCredits: primaryRemainingCredits,
+    capacityCredits: primaryCapacityCredits,
+    remainingPercent: primaryRemaining,
+  });
+  const secondaryUsageDisplay = formatUsageDisplay({
+    remainingCredits: secondaryRemainingCredits,
+    capacityCredits: secondaryCapacityCredits,
+    remainingPercent: secondaryRemaining,
+  });
 
   const title = account.displayName || account.email;
   const compactId = formatCompactAccountId(account.accountId);
@@ -125,17 +120,15 @@ export function AccountCard({
   const heading = showAccountId && !emailSubtitle ? `${title} (${compactId})` : title;
   const subtitle = showAccountId && emailSubtitle ? `${emailSubtitle} | ID ${compactId}` : emailSubtitle;
 
-  const quotaSummary = (label: string, percent: number | null, resetLabel: string) => {
-    const percentLabel = formatPercentNullable(percent);
-    const srPercent = percentLabel === "--" ? "brak danych" : percentLabel;
-    return `${label}: pozostało ${srPercent}, reset ${resetLabel}.`;
+  const quotaSummary = (label: string, usageDisplay: UsageDisplay, resetLabel: string) => {
+    return `${label}: pozostało ${usageDisplay.srValue}, reset ${resetLabel}.`;
   };
 
   const summaryParts = [heading];
   if (subtitle) summaryParts.push(subtitle);
   summaryParts.push(`Status: ${statusLabel}.`);
-  if (!weeklyOnly) summaryParts.push(quotaSummary("Główne", primaryRemaining, primaryReset));
-  summaryParts.push(quotaSummary("Wtórne", secondaryRemaining, secondaryReset));
+  if (!weeklyOnly) summaryParts.push(quotaSummary("Główne", primaryUsageDisplay, primaryReset));
+  summaryParts.push(quotaSummary("Wtórne", secondaryUsageDisplay, secondaryReset));
   const srSummary = summaryParts.join(" ");
 
   return (
@@ -163,16 +156,14 @@ export function AccountCard({
               label="Główne"
               percent={primaryRemaining}
               resetLabel={primaryReset}
-              remainingCredits={primaryRemainingCredits}
-              capacityCredits={primaryCapacityCredits}
+              usageDisplay={primaryUsageDisplay}
             />
           )}
           <QuotaBar
             label="Wtórne"
             percent={secondaryRemaining}
             resetLabel={secondaryReset}
-            remainingCredits={secondaryRemainingCredits}
-            capacityCredits={secondaryCapacityCredits}
+            usageDisplay={secondaryUsageDisplay}
           />
         </div>
       </div>
