@@ -6,8 +6,8 @@ import { RefreshCw } from "lucide-react";
 import { AlertMessage } from "@/components/alert-message";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAccountMutations } from "@/features/accounts/hooks/use-accounts";
+import { AccountCardPanel } from "@/features/dashboard/components/account-card-panel";
 import { AccountsSummaryTable } from "@/features/dashboard/components/accounts-summary-table";
-import { AccountCards } from "@/features/dashboard/components/account-cards";
 import { DashboardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { RequestFilters } from "@/features/dashboard/components/filters/request-filters";
 import { RecentRequestsTable } from "@/features/dashboard/components/recent-requests-table";
@@ -213,8 +213,8 @@ export function DashboardPage() {
                 />
               </div>
               <div className="space-y-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karty kont</h3>
-                <AccountCards
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karta konta</h3>
+                <AccountCardPanel
                   accounts={overview?.accounts ?? []}
                   primaryUsageByAccount={primaryUsageByAccount}
                   secondaryUsageByAccount={secondaryUsageByAccount}
