@@ -5,6 +5,7 @@ import { AlertMessage } from "@/components/alert-message";
 import { LoadingOverlay } from "@/components/layout/loading-overlay";
 import { ApiKeysSection } from "@/features/api-keys/components/api-keys-section";
 import { AppearanceSettings } from "@/features/settings/components/appearance-settings";
+import { DashboardDisplaySettings } from "@/features/settings/components/dashboard-display-settings";
 import { ImportSettings } from "@/features/settings/components/import-settings";
 import { PasswordSettings } from "@/features/settings/components/password-settings";
 import { RoutingSettings } from "@/features/settings/components/routing-settings";
@@ -47,6 +48,7 @@ export function SettingsPage() {
 
           <div className="space-y-4">
             <AppearanceSettings />
+            <DashboardDisplaySettings />
             <RoutingSettings
               settings={settings}
               busy={busy}

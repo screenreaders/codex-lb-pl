@@ -18,6 +18,7 @@ import { useDashboard } from "@/features/dashboard/hooks/use-dashboard";
 import { useRequestLogs } from "@/features/dashboard/hooks/use-request-logs";
 import { buildDashboardView } from "@/features/dashboard/utils";
 import type { AccountSummary } from "@/features/dashboard/schemas";
+import { useDashboardDisplayStore } from "@/hooks/use-dashboard-display";
 import { isRefreshIntervalValue, REFRESH_INTERVAL_OPTIONS, useRefreshIntervalStore } from "@/hooks/use-refresh-interval";
 import { useThemeStore } from "@/hooks/use-theme";
 import { REQUEST_STATUS_LABELS } from "@/utils/constants";
@@ -29,6 +30,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isDark = useThemeStore((s) => s.theme === "dark");
+  const accountsView = useDashboardDisplayStore((s) => s.accountsView);
   const refreshInterval = useRefreshIntervalStore((s) => s.interval);
   const setRefreshInterval = useRefreshIntervalStore((s) => s.setInterval);
   const dashboardQuery = useDashboard();
@@ -202,12 +204,34 @@ export function DashboardPage() {
               </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <Tabs defaultValue="table" className="space-y-4">
-              <TabsList aria-label="Widok kont">
-                <TabsTrigger value="table">Podsumowanie (tabela)</TabsTrigger>
-                <TabsTrigger value="card">Karta konta</TabsTrigger>
-              </TabsList>
-              <TabsContent value="table" className="space-y-3">
+            {accountsView === "tabs" ? (
+              <Tabs defaultValue="table" className="space-y-4">
+                <TabsList aria-label="Widok kont">
+                  <TabsTrigger value="table">Podsumowanie (tabela)</TabsTrigger>
+                  <TabsTrigger value="card">Karta konta</TabsTrigger>
+                </TabsList>
+                <TabsContent value="table" className="space-y-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Podsumowanie kont</h3>
+                  <AccountsSummaryTable
+                    accounts={overview?.accounts ?? []}
+                    primaryUsageByAccount={primaryUsageByAccount}
+                    secondaryUsageByAccount={secondaryUsageByAccount}
+                    primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
+                    secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
+                  />
+                </TabsContent>
+                <TabsContent value="card" className="space-y-3">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karta konta</h3>
+                  <AccountCardPanel
+                    accounts={overview?.accounts ?? []}
+                    primaryUsageByAccount={primaryUsageByAccount}
+                    secondaryUsageByAccount={secondaryUsageByAccount}
+                    onAction={handleAccountAction}
+                  />
+                </TabsContent>
+              </Tabs>
+            ) : accountsView === "table" ? (
+              <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Podsumowanie kont</h3>
                 <AccountsSummaryTable
                   accounts={overview?.accounts ?? []}
@@ -216,8 +240,9 @@ export function DashboardPage() {
                   primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
                   secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
                 />
-              </TabsContent>
-              <TabsContent value="card" className="space-y-3">
+              </div>
+            ) : (
+              <div className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karta konta</h3>
                 <AccountCardPanel
                   accounts={overview?.accounts ?? []}
@@ -225,8 +250,8 @@ export function DashboardPage() {
                   secondaryUsageByAccount={secondaryUsageByAccount}
                   onAction={handleAccountAction}
                 />
-              </TabsContent>
-            </Tabs>
+              </div>
+            )}
           </section>
 
           <section className="space-y-4" aria-labelledby="request-logs-section-title">
