@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
 import { AlertMessage } from "@/components/alert-message";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAccountMutations } from "@/features/accounts/hooks/use-accounts";
 import { AccountCardPanel } from "@/features/dashboard/components/account-card-panel";
@@ -201,8 +202,12 @@ export function DashboardPage() {
               </h2>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <div className="space-y-6">
-              <div className="space-y-3">
+            <Tabs defaultValue="table" className="space-y-4">
+              <TabsList aria-label="Widok kont">
+                <TabsTrigger value="table">Podsumowanie (tabela)</TabsTrigger>
+                <TabsTrigger value="card">Karta konta</TabsTrigger>
+              </TabsList>
+              <TabsContent value="table" className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Podsumowanie kont</h3>
                 <AccountsSummaryTable
                   accounts={overview?.accounts ?? []}
@@ -211,8 +216,8 @@ export function DashboardPage() {
                   primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
                   secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
                 />
-              </div>
-              <div className="space-y-3">
+              </TabsContent>
+              <TabsContent value="card" className="space-y-3">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Karta konta</h3>
                 <AccountCardPanel
                   accounts={overview?.accounts ?? []}
@@ -220,8 +225,8 @@ export function DashboardPage() {
                   secondaryUsageByAccount={secondaryUsageByAccount}
                   onAction={handleAccountAction}
                 />
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
           </section>
 
           <section className="space-y-4" aria-labelledby="request-logs-section-title">
