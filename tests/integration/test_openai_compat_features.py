@@ -115,8 +115,6 @@ async def test_v1_responses_rejects_previous_response_id(async_client):
 @pytest.mark.parametrize(
     "tool_payload",
     [
-        {"type": "file_search", "vector_store_ids": ["vs_dummy"]},
-        {"type": "code_interpreter", "container": {"type": "auto"}},
         {
             "type": "computer_use_preview",
             "display_width": 1024,

@@ -19,8 +19,6 @@ _RESPONSES_INCLUDE_ALLOWLIST = {
 }
 
 UNSUPPORTED_TOOL_TYPES = {
-    "file_search",
-    "code_interpreter",
     "computer_use",
     "computer_use_preview",
     "image_generation",

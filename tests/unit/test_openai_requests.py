@@ -299,6 +299,20 @@ def test_v1_rejects_builtin_tools():
         V1ResponsesRequest.model_validate(payload)
 
 
+def test_v1_allows_file_search_and_code_interpreter_tools():
+    payload = {
+        "model": "gpt-5.1",
+        "input": [],
+        "tools": [
+            {"type": "file_search", "vector_store_ids": ["vs_dummy"]},
+            {"type": "code_interpreter", "container": {"type": "auto"}},
+        ],
+    }
+    request = V1ResponsesRequest.model_validate(payload).to_responses_request()
+
+    assert request.tools == payload["tools"]
+
+
 def test_v1_compact_messages_convert():
     payload = {
         "model": "gpt-5.1",
