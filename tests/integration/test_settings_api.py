@@ -11,7 +11,10 @@ async def test_settings_api_get_and_update(async_client):
     assert response.status_code == 200
     payload = response.json()
     assert payload["stickyThreadsEnabled"] is False
+    assert payload["upstreamStreamTransport"] == "default"
     assert payload["preferEarlierResetAccounts"] is False
+    assert payload["routingStrategy"] == "usage_weighted"
+    assert payload["openaiCacheAffinityMaxAgeSeconds"] == 1800
     assert payload["importWithoutOverwrite"] is False
     assert payload["totpRequiredOnLogin"] is False
     assert payload["totpConfigured"] is False
@@ -21,7 +24,10 @@ async def test_settings_api_get_and_update(async_client):
         "/api/settings",
         json={
             "stickyThreadsEnabled": True,
+            "upstreamStreamTransport": "websocket",
             "preferEarlierResetAccounts": True,
+            "routingStrategy": "round_robin",
+            "openaiCacheAffinityMaxAgeSeconds": 180,
             "importWithoutOverwrite": True,
             "totpRequiredOnLogin": False,
             "apiKeyAuthEnabled": True,
@@ -30,7 +36,10 @@ async def test_settings_api_get_and_update(async_client):
     assert response.status_code == 200
     updated = response.json()
     assert updated["stickyThreadsEnabled"] is True
+    assert updated["upstreamStreamTransport"] == "websocket"
     assert updated["preferEarlierResetAccounts"] is True
+    assert updated["routingStrategy"] == "round_robin"
+    assert updated["openaiCacheAffinityMaxAgeSeconds"] == 180
     assert updated["importWithoutOverwrite"] is True
     assert updated["totpRequiredOnLogin"] is False
     assert updated["totpConfigured"] is False
@@ -40,7 +49,10 @@ async def test_settings_api_get_and_update(async_client):
     assert response.status_code == 200
     payload = response.json()
     assert payload["stickyThreadsEnabled"] is True
+    assert payload["upstreamStreamTransport"] == "websocket"
     assert payload["preferEarlierResetAccounts"] is True
+    assert payload["routingStrategy"] == "round_robin"
+    assert payload["openaiCacheAffinityMaxAgeSeconds"] == 180
     assert payload["importWithoutOverwrite"] is True
     assert payload["totpRequiredOnLogin"] is False
     assert payload["totpConfigured"] is False

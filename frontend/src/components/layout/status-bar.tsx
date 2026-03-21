@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { Activity, ArrowRightLeft } from "lucide-react";
+import { Activity, ArrowRightLeft, Tag } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { getDashboardOverview } from "@/features/dashboard/api";
 import { getSettings } from "@/features/settings/api";
 import { formatTimeLong } from "@/utils/formatters";
 
-function getRoutingLabel(sticky: boolean, preferEarlier: boolean): string {
+function getRoutingLabel(strategy: "usage_weighted" | "round_robin", sticky: boolean, preferEarlier: boolean): string {
+  if (strategy === "round_robin") {
+    return sticky ? "Round robin + stałe przypisanie" : "Round robin";
+  }
   if (sticky && preferEarlier) return "Stałe przypisanie + preferowany wcześniejszy reset";
   if (sticky) return "Stałe przypisanie";
   if (preferEarlier) return "Preferuj wcześniejszy reset";
@@ -38,15 +41,15 @@ export function StatusBar() {
   }, [lastSyncAt]);
 
   const routingLabel = settings
-    ? getRoutingLabel(settings.stickyThreadsEnabled, settings.preferEarlierResetAccounts)
+    ? getRoutingLabel(settings.routingStrategy, settings.stickyThreadsEnabled, settings.preferEarlierResetAccounts)
     : "—";
 
   return (
     <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.08] bg-background/50 px-4 py-2 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] backdrop-blur-xl backdrop-saturate-[1.8] supports-[backdrop-filter]:bg-background/40 dark:shadow-[0_-1px_12px_rgba(0,0,0,0.25)]">
-      <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground">
+      <div className="mx-auto flex w-full max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-1 text-xs text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           {isLive ? (
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-label="Na żywo" />
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" title="Na żywo" />
           ) : (
             <Activity className="h-3 w-3" aria-hidden="true" />
           )}
@@ -55,6 +58,10 @@ export function StatusBar() {
         <span className="inline-flex items-center gap-1.5">
           <ArrowRightLeft className="h-3 w-3" aria-hidden="true" />
           <span className="font-medium">Trasowanie:</span> {routingLabel}
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Tag className="h-3 w-3" aria-hidden="true" />
+          <span className="font-medium">Wersja:</span> {__APP_VERSION__}
         </span>
       </div>
     </footer>

@@ -1,6 +1,17 @@
+import { useState } from "react";
 import { Route } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { buildSettingsUpdateRequest } from "@/features/settings/payload";
 import type { DashboardSettings, SettingsUpdateRequest } from "@/features/settings/schemas";
 
 export type RoutingSettingsProps = {
@@ -10,14 +21,17 @@ export type RoutingSettingsProps = {
 };
 
 export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps) {
+  const [cacheAffinityTtl, setCacheAffinityTtl] = useState(
+    String(settings.openaiCacheAffinityMaxAgeSeconds),
+  );
+
   const save = (patch: Partial<SettingsUpdateRequest>) =>
-    void onSave({
-      stickyThreadsEnabled: settings.stickyThreadsEnabled,
-      preferEarlierResetAccounts: settings.preferEarlierResetAccounts,
-      totpRequiredOnLogin: settings.totpRequiredOnLogin,
-      apiKeyAuthEnabled: settings.apiKeyAuthEnabled,
-      ...patch,
-    });
+    void onSave(buildSettingsUpdateRequest(settings, patch));
+
+  const parsedCacheAffinityTtl = Number.parseInt(cacheAffinityTtl, 10);
+  const cacheAffinityTtlValid = Number.isInteger(parsedCacheAffinityTtl) && parsedCacheAffinityTtl > 0;
+  const cacheAffinityTtlChanged =
+    cacheAffinityTtlValid && parsedCacheAffinityTtl !== settings.openaiCacheAffinityMaxAgeSeconds;
 
   return (
     <section className="rounded-xl border bg-card p-5">
@@ -35,6 +49,50 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
         </div>
 
         <div className="divide-y rounded-lg border">
+          <div className="flex items-center justify-between gap-4 p-3">
+            <div>
+              <p className="text-sm font-medium">Transport strumienia upstream</p>
+              <p className="text-xs text-muted-foreground">
+                Wybierz sposób, w jaki `codex-lb` łączy się upstream dla strumieniowanych odpowiedzi.
+              </p>
+            </div>
+            <Select
+              value={settings.upstreamStreamTransport}
+              onValueChange={(value) =>
+                save({ upstreamStreamTransport: value as "default" | "auto" | "http" | "websocket" })
+              }
+            >
+              <SelectTrigger className="h-8 w-44 text-xs" disabled={busy}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectItem value="default">Domyślne serwera</SelectItem>
+                <SelectItem value="auto">Auto</SelectItem>
+                <SelectItem value="http">Odpowiedzi</SelectItem>
+                <SelectItem value="websocket">WebSockety</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 p-3">
+            <div>
+              <p className="text-sm font-medium">Strategia routingu</p>
+              <p className="text-xs text-muted-foreground">Wybierz równoważenie wg użycia lub ścisły round robin.</p>
+            </div>
+            <Select
+              value={settings.routingStrategy}
+              onValueChange={(value) => save({ routingStrategy: value as "usage_weighted" | "round_robin" })}
+            >
+              <SelectTrigger className="h-8 w-44 text-xs" disabled={busy}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectItem value="usage_weighted">Ważone użyciem</SelectItem>
+                <SelectItem value="round_robin">Round robin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="flex items-center justify-between p-3">
             <div>
               <p className="text-sm font-medium">Stałe przypisanie</p>
@@ -57,6 +115,42 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
               disabled={busy}
               onCheckedChange={(checked) => save({ preferEarlierResetAccounts: checked })}
             />
+          </div>
+
+          <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-medium">TTL powiązania cache promptów</p>
+              <p className="text-xs text-muted-foreground">
+                Utrzymuj mapowania cache promptów w stylu OpenAI przez określoną liczbę sekund.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min={1}
+                step={1}
+                inputMode="numeric"
+                value={cacheAffinityTtl}
+                disabled={busy}
+                onChange={(event) => setCacheAffinityTtl(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && cacheAffinityTtlChanged) {
+                    void save({ openaiCacheAffinityMaxAgeSeconds: parsedCacheAffinityTtl });
+                  }
+                }}
+                className="h-8 w-28 text-xs"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs"
+                disabled={busy || !cacheAffinityTtlChanged}
+                onClick={() => void save({ openaiCacheAffinityMaxAgeSeconds: parsedCacheAffinityTtl })}
+              >
+                Save TTL
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -38,6 +38,10 @@ const ApiKeyCreatePayloadSchema = z.object({
   name: z.string().optional(),
 }).passthrough();
 
+const FirewallIpCreatePayloadSchema = z.object({
+  ipAddress: z.string().optional(),
+}).passthrough();
+
 const ApiKeyUpdatePayloadSchema = z.object({
   name: z.string().optional(),
   allowedModels: z.array(z.string()).nullable().optional(),
@@ -55,7 +59,10 @@ const ApiKeyUpdatePayloadSchema = z.object({
 
 const SettingsPayloadSchema = z.object({
   stickyThreadsEnabled: z.boolean().optional(),
+  upstreamStreamTransport: z.enum(["default", "auto", "http", "websocket"]).optional(),
   preferEarlierResetAccounts: z.boolean().optional(),
+  routingStrategy: z.enum(["usage_weighted", "round_robin"]).optional(),
+  openaiCacheAffinityMaxAgeSeconds: z.number().int().positive().optional(),
   importWithoutOverwrite: z.boolean().optional(),
   totpRequiredOnLogin: z.boolean().optional(),
   totpConfigured: z.boolean().optional(),
@@ -74,19 +81,41 @@ async function parseJsonBody<T>(request: Request, schema: z.ZodType<T>): Promise
   }
 }
 
-const state: {
+type MockState = {
   accounts: AccountSummary[];
   requestLogs: RequestLogEntry[];
   authSession: DashboardAuthSession;
   settings: DashboardSettings;
   apiKeys: ApiKey[];
-} = {
-  accounts: createDefaultAccounts(),
-  requestLogs: createDefaultRequestLogs(),
-  authSession: createDashboardAuthSession(),
-  settings: createDashboardSettings(),
-  apiKeys: createDefaultApiKeys(),
+  firewallEntries: Array<{ ipAddress: string; createdAt: string }>;
+  stickySessions: Array<{
+    key: string;
+    accountId: string;
+    kind: "codex_session" | "sticky_thread" | "prompt_cache";
+    createdAt: string;
+    updatedAt: string;
+    expiresAt: string | null;
+    isStale: boolean;
+  }>;
 };
+
+function createInitialState(): MockState {
+  return {
+    accounts: createDefaultAccounts(),
+    requestLogs: createDefaultRequestLogs(),
+    authSession: createDashboardAuthSession(),
+    settings: createDashboardSettings(),
+    apiKeys: createDefaultApiKeys(),
+    firewallEntries: [],
+    stickySessions: [],
+  };
+}
+
+let state: MockState = createInitialState();
+
+export function resetMockState(): void {
+  state = createInitialState();
+}
 
 function parseDateValue(value: string | null): number | null {
   if (!value) {
@@ -108,7 +137,7 @@ function filterRequestLogs(url: URL, options?: { includeStatuses?: boolean }): R
   const until = parseDateValue(url.searchParams.get("until"));
 
   return state.requestLogs.filter((entry) => {
-    if (accountIds.size > 0 && !accountIds.has(entry.accountId)) {
+    if (accountIds.size > 0 && (!entry.accountId || !accountIds.has(entry.accountId))) {
       return false;
     }
 
@@ -146,6 +175,7 @@ function filterRequestLogs(url: URL, options?: { includeStatuses?: boolean }): R
     if (search.length > 0) {
       const haystack = [
         entry.accountId,
+        entry.apiKeyName,
         entry.requestId,
         entry.model,
         entry.reasoningEffort,
@@ -166,7 +196,7 @@ function filterRequestLogs(url: URL, options?: { includeStatuses?: boolean }): R
 }
 
 function requestLogOptionsFromEntries(entries: RequestLogEntry[]) {
-  const accountIds = [...new Set(entries.map((entry) => entry.accountId))].sort();
+  const accountIds = [...new Set(entries.map((entry) => entry.accountId).filter((id): id is string => id != null))].sort();
 
   const modelMap = new Map<string, { model: string; reasoningEffort: string | null }>();
   for (const entry of entries) {
@@ -336,6 +366,46 @@ export const handlers = [
     return HttpResponse.json(state.settings);
   }),
 
+  http.get("/api/firewall/ips", () => {
+    return HttpResponse.json({
+      mode: state.firewallEntries.length === 0 ? "allow_all" : "allowlist_active",
+      entries: state.firewallEntries,
+    });
+  }),
+
+  http.post("/api/firewall/ips", async ({ request }) => {
+    const payload = await parseJsonBody(request, FirewallIpCreatePayloadSchema);
+    const ipAddress = String(payload?.ipAddress || "").trim();
+    if (!ipAddress) {
+      return HttpResponse.json(
+        { error: { code: "invalid_ip", message: "IP address is required" } },
+        { status: 400 },
+      );
+    }
+    if (state.firewallEntries.some((entry) => entry.ipAddress === ipAddress)) {
+      return HttpResponse.json(
+        { error: { code: "ip_exists", message: "IP address already exists" } },
+        { status: 409 },
+      );
+    }
+    const created = { ipAddress, createdAt: new Date().toISOString() };
+    state.firewallEntries = [...state.firewallEntries, created];
+    return HttpResponse.json(created);
+  }),
+
+  http.delete("/api/firewall/ips/:ipAddress", ({ params }) => {
+    const ipAddress = decodeURIComponent(String(params.ipAddress));
+    const exists = state.firewallEntries.some((entry) => entry.ipAddress === ipAddress);
+    if (!exists) {
+      return HttpResponse.json(
+        { error: { code: "ip_not_found", message: "IP address not found" } },
+        { status: 404 },
+      );
+    }
+    state.firewallEntries = state.firewallEntries.filter((entry) => entry.ipAddress !== ipAddress);
+    return HttpResponse.json({ status: "deleted" });
+  }),
+
   http.put("/api/settings", async ({ request }) => {
     const payload = await parseJsonBody(request, SettingsPayloadSchema);
     if (!payload) {
@@ -346,6 +416,46 @@ export const handlers = [
       ...payload,
     });
     return HttpResponse.json(state.settings);
+  }),
+
+  http.get("/api/sticky-sessions", ({ request }) => {
+    const url = new URL(request.url);
+    const staleOnly = url.searchParams.get("staleOnly") === "true";
+    const entries = staleOnly
+      ? state.stickySessions.filter((entry) => entry.kind === "prompt_cache" && entry.isStale)
+      : state.stickySessions;
+    const stalePromptCacheCount = state.stickySessions.filter(
+      (entry) => entry.kind === "prompt_cache" && entry.isStale,
+    ).length;
+    return HttpResponse.json({ entries, stalePromptCacheCount });
+  }),
+
+  http.delete("/api/sticky-sessions/:kind/:key", ({ params }) => {
+    const key = decodeURIComponent(String(params.key));
+    const kind = String(params.kind);
+    const exists = state.stickySessions.some((entry) => entry.key === key && entry.kind === kind);
+    if (!exists) {
+      return HttpResponse.json(
+        { error: { code: "sticky_session_not_found", message: "Sticky session not found" } },
+        { status: 404 },
+      );
+    }
+    state.stickySessions = state.stickySessions.filter((entry) => !(entry.key === key && entry.kind === kind));
+    return HttpResponse.json({ status: "deleted" });
+  }),
+
+  http.post("/api/sticky-sessions/purge", async ({ request }) => {
+    const payload = (await parseJsonBody(request, z.object({ staleOnly: z.boolean().default(true) }))) ?? {
+      staleOnly: true,
+    };
+    if (payload.staleOnly) {
+      const before = state.stickySessions.length;
+      state.stickySessions = state.stickySessions.filter((entry) => !entry.isStale);
+      return HttpResponse.json({ deletedCount: before - state.stickySessions.length });
+    }
+    const deletedCount = state.stickySessions.length;
+    state.stickySessions = [];
+    return HttpResponse.json({ deletedCount });
   }),
 
   http.get("/api/dashboard-auth/session", () => {

@@ -18,18 +18,15 @@ The frontend SHALL be a standalone Vite + React + TypeScript project located at 
 - **THEN** Vite outputs optimized assets (JS, CSS, index.html) to `app/static/` with content-hashed filenames
 
 ### Requirement: SPA routing
-
-The application SHALL use React Router v6 for client-side routing with three routes: `/dashboard`, `/accounts`, `/settings`. The root path `/` SHALL redirect to `/dashboard`. FastAPI SHALL serve `index.html` for all unmatched routes as a SPA fallback.
+The application SHALL use React Router v6 for client-side routing with four routes: `/dashboard`, `/accounts`, `/settings`, `/firewall`. The root path `/` SHALL redirect to `/dashboard`. FastAPI SHALL serve `index.html` for all unmatched routes as a SPA fallback.
 
 #### Scenario: Direct navigation to route
-
-- **WHEN** a user navigates directly to `/accounts` in the browser
-- **THEN** FastAPI serves `index.html` and React Router renders the Accounts page
+- **WHEN** a user navigates directly to `/firewall` in the browser
+- **THEN** FastAPI serves `index.html` and React Router renders the Firewall page
 
 #### Scenario: Client-side navigation
-
-- **WHEN** a user clicks the "Settings" tab from the Dashboard page
-- **THEN** the URL changes to `/settings` without a full page reload and the Settings page renders
+- **WHEN** a user clicks the "Firewall" tab from another page
+- **THEN** the URL changes to `/firewall` without full page reload and the Firewall page renders
 
 ### Requirement: Authentication gate
 
@@ -88,6 +85,28 @@ The Dashboard page SHALL display: summary metric cards (requests 7d, tokens, cos
 - **WHEN** a user changes the page size or navigates to the next page
 - **THEN** the request logs query refetches with updated offset/limit parameters and the response includes `total` count and `has_more` flag for pagination state
 
+### Requirement: Request logs display fast-mode service tier
+When a request log entry includes `service_tier`, the dashboard request-log API response MUST expose it and the recent-requests UI MUST render it alongside the model label.
+
+#### Scenario: Fast-mode request log entry is visible
+- **WHEN** a request log entry is recorded with `service_tier: "priority"`
+- **THEN** the `GET /api/request-logs` response includes `serviceTier: "priority"`
+- **AND** the dashboard recent-requests table renders the model label with the priority tier visible
+
+### Requirement: Request log transport is visible in the dashboard
+
+The Dashboard recent requests table SHALL display each row's recorded request transport so operators can distinguish websocket and HTTP proxy traffic without leaving the UI. The table SHALL remain renderable for legacy rows whose transport is missing.
+
+#### Scenario: Websocket request row is visible
+
+- **WHEN** `/api/request-logs` returns a request row with `transport = "websocket"`
+- **THEN** the recent requests table shows a visible websocket transport indicator for that row
+
+#### Scenario: Legacy request row without transport still renders
+
+- **WHEN** `/api/request-logs` returns a request row with `transport = null`
+- **THEN** the recent requests table still renders the row and shows a neutral placeholder instead of breaking layout
+
 ### Requirement: Accounts page
 
 The Accounts page SHALL display a two-column layout: left panel with searchable account list, import button, and add account button; right panel with selected account details including usage, token info, and actions (pause/resume/delete/re-authenticate).
@@ -122,12 +141,22 @@ The Accounts page SHALL display a two-column layout: left panel with searchable 
 
 ### Requirement: Settings page
 
-The Settings page SHALL include sections for: routing settings (sticky threads, reset priority), password management (setup/change/remove), TOTP management (setup/disable), API key auth toggle, and API key management (table, create, edit, delete, regenerate).
+The Settings page SHALL include sections for: routing settings (sticky threads, reset priority, prompt-cache affinity TTL), password management (setup/change/remove), TOTP management (setup/disable), API key auth toggle, API key management (table, create, edit, delete, regenerate), and sticky-session administration.
 
 #### Scenario: Save routing settings
 
-- **WHEN** a user toggles sticky threads or reset priority
+- **WHEN** a user toggles sticky threads, reset priority, or updates the prompt-cache affinity TTL
 - **THEN** the app calls `PUT /api/settings` with the updated values
+
+#### Scenario: View sticky-session mappings
+
+- **WHEN** a user opens the sticky-session section on the Settings page
+- **THEN** the app fetches sticky-session entries and displays each mapping's kind, account, timestamps, and stale/expiry state
+
+#### Scenario: Purge stale prompt-cache mappings
+
+- **WHEN** a user requests a stale purge from the sticky-session section
+- **THEN** the app calls the sticky-session purge API and refreshes the list afterward
 
 #### Scenario: Password setup
 
@@ -251,4 +280,27 @@ After migration is complete, the old frontend files SHALL be removed: `app/stati
 
 - **WHEN** the React build outputs to `app/static/`
 - **THEN** no legacy Alpine.js files remain in the directory
+
+### Requirement: Firewall page in React dashboard
+The React dashboard MUST provide a Firewall page that displays current mode (`allow_all` or `allowlist_active`) and allows adding/removing IP addresses via `/api/firewall/ips`.
+
+#### Scenario: Firewall page loads list
+- **WHEN** user opens `/firewall`
+- **THEN** frontend requests `GET /api/firewall/ips` and renders mode + entries
+
+#### Scenario: User adds IP entry
+- **WHEN** user submits a valid IP in firewall form
+- **THEN** frontend calls `POST /api/firewall/ips` and refreshes rendered list
+
+#### Scenario: User removes IP entry
+- **WHEN** user confirms deletion for an existing firewall entry
+- **THEN** frontend calls `DELETE /api/firewall/ips/{ip}` and refreshes rendered list
+
+### Requirement: Accounts page renders mapped additional quota labels
+The Accounts page MUST render known additional quotas with their mapped user-facing label from canonical quota metadata instead of depending on raw upstream `limitName` strings.
+
+#### Scenario: Codex Spark quota uses mapped label after alias drift
+- **WHEN** an account summary contains an additional quota whose canonical key corresponds to `gpt-5.3-codex-spark`
+- **AND** the raw upstream `limitName` has changed from an earlier alias
+- **THEN** the Accounts page renders the quota label as `GPT-5.3-Codex-Spark`
 

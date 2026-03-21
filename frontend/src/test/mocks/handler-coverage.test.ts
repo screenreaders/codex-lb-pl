@@ -51,6 +51,13 @@ const EXPECTED_ENDPOINTS = [
   // settings
   "GET /api/settings",
   "PUT /api/settings",
+  "GET /api/sticky-sessions",
+  "DELETE /api/sticky-sessions/:kind/:key",
+  "POST /api/sticky-sessions/purge",
+  // firewall
+  "GET /api/firewall/ips",
+  "POST /api/firewall/ips",
+  "DELETE /api/firewall/ips/:ipAddress",
   // models
   "GET /api/models",
   // api-keys

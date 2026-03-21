@@ -63,14 +63,20 @@ export function DashboardPage() {
   }, [overview, logPage, isDark]);
 
   const accountOptions = useMemo(() => {
-    const labels = new Map<string, string>();
+    const entries = new Map<string, { label: string; isEmail: boolean }>();
     for (const account of overview?.accounts ?? []) {
-      labels.set(account.accountId, account.displayName || account.email || account.accountId);
+      const raw = account.displayName || account.email || account.accountId;
+      const isEmail = !!account.email && raw === account.email;
+      entries.set(account.accountId, { label: raw, isEmail });
     }
-    return (optionsQuery.data?.accountIds ?? []).map((accountId) => ({
-      value: accountId,
-      label: labels.get(accountId) ?? accountId,
-    }));
+    return (optionsQuery.data?.accountIds ?? []).map((accountId) => {
+      const entry = entries.get(accountId);
+      return {
+        value: accountId,
+        label: entry?.label ?? accountId,
+        isEmail: entry?.isEmail ?? false,
+      };
+    });
   }, [optionsQuery.data?.accountIds, overview?.accounts]);
 
   const modelOptions = useMemo(
@@ -126,14 +132,14 @@ export function DashboardPage() {
         <>
           <StatsGrid stats={view.stats} />
 
-          <UsageDonuts
-            primaryItems={view.primaryUsageItems}
-            secondaryItems={view.secondaryUsageItems}
-            primaryTotal={overview?.summary.primaryWindow.capacityCredits ?? 0}
-            secondaryTotal={overview?.summary.secondaryWindow?.capacityCredits ?? 0}
-            primaryWindowMinutes={overview?.windows.primary.windowMinutes ?? null}
-            secondaryWindowMinutes={overview?.windows.secondary?.windowMinutes ?? null}
-          />
+            <UsageDonuts
+              primaryItems={view.primaryUsageItems}
+              secondaryItems={view.secondaryUsageItems}
+              primaryTotal={overview?.summary.primaryWindow.capacityCredits ?? 0}
+              secondaryTotal={overview?.summary.secondaryWindow?.capacityCredits ?? 0}
+              safeLinePrimary={view.safeLinePrimary}
+              safeLineSecondary={view.safeLineSecondary}
+            />
 
           <section className="space-y-4">
             <div className="flex items-center gap-3">

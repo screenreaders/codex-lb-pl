@@ -165,6 +165,22 @@ export function createDashboardOverview(overrides: Partial<DashboardOverview> = 
       cost: createTrendPoints(0.065),
       errorRate: createTrendPoints(0.03),
     },
+    depletionPrimary: {
+      risk: 0.55,
+      riskLevel: "warning" as const,
+      burnRate: 1.1,
+      safeUsagePercent: 72.0,
+      projectedExhaustionAt: null,
+      secondsUntilExhaustion: null,
+    },
+    depletionSecondary: {
+      risk: 0.65,
+      riskLevel: "warning" as const,
+      burnRate: 1.4,
+      safeUsagePercent: 58.0,
+      projectedExhaustionAt: null,
+      secondsUntilExhaustion: null,
+    },
     ...overrides,
   };
   return DashboardOverviewSchema.parse(response);
@@ -174,8 +190,13 @@ export function createRequestLogEntry(overrides: Partial<RequestLogEntry> = {}):
   return RequestLogSchema.parse({
     requestedAt: offsetIso(-1),
     accountId: "acc_primary",
+    apiKeyName: "Primary Key",
     requestId: "req_1",
     model: "gpt-5.1",
+    transport: "http",
+    serviceTier: null,
+    requestedServiceTier: null,
+    actualServiceTier: null,
     status: "ok",
     errorCode: null,
     errorMessage: null,
@@ -194,6 +215,7 @@ export function createDefaultRequestLogs(): RequestLogEntry[] {
     createRequestLogEntry({
       requestId: "req_2",
       accountId: "acc_secondary",
+      apiKeyName: "Secondary Key",
       status: "rate_limit",
       errorCode: "rate_limit_exceeded",
       errorMessage: "Rate limit reached",
@@ -204,6 +226,7 @@ export function createDefaultRequestLogs(): RequestLogEntry[] {
     }),
     createRequestLogEntry({
       requestId: "req_3",
+      apiKeyName: null,
       status: "quota",
       errorCode: "insufficient_quota",
       errorMessage: "Quota exceeded",
@@ -256,7 +279,10 @@ export function createDashboardAuthSession(
 export function createDashboardSettings(overrides: Partial<DashboardSettings> = {}): DashboardSettings {
   return DashboardSettingsSchema.parse({
     stickyThreadsEnabled: true,
+    upstreamStreamTransport: "default",
     preferEarlierResetAccounts: false,
+    routingStrategy: "usage_weighted",
+    openaiCacheAffinityMaxAgeSeconds: 300,
     importWithoutOverwrite: false,
     totpRequiredOnLogin: false,
     totpConfigured: true,

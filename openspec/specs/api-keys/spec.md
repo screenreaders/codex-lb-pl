@@ -99,7 +99,7 @@ The system SHALL provide an `api_key_auth_enabled` boolean in `DashboardSettings
 
 ### Requirement: API Key Bearer authentication guard
 
-The system SHALL validate API keys on proxy routes (`/v1/*`, `/backend-api/codex/*`) when `api_key_auth_enabled` is true. Validation MUST be implemented as a router-level `Security` dependency, not ASGI middleware. The dependency MUST compute `sha256` of the Bearer token and look up the hash in the `api_keys` table.
+The system SHALL validate API keys on proxy routes (`/v1/*`, `/backend-api/codex/*`, `/backend-api/transcribe`) when `api_key_auth_enabled` is true. Validation MUST be implemented as a router-level `Security` dependency, not ASGI middleware. The dependency MUST compute `sha256` of the Bearer token and look up the hash in the `api_keys` table.
 
 The dependency SHALL return a typed `ApiKeyData` value directly to the route handler. Route handlers MUST NOT access API key data via `request.state`.
 
@@ -109,7 +109,7 @@ The dependency SHALL raise a domain exception on validation failure. The excepti
 
 #### Scenario: API key guard route scope
 
-- **WHEN** `api_key_auth_enabled` is true and a request is made to `/v1/responses` or `/backend-api/codex/responses`
+- **WHEN** `api_key_auth_enabled` is true and a request is made to `/v1/responses`, `/backend-api/codex/responses`, `/v1/audio/transcriptions`, or `/backend-api/transcribe`
 - **THEN** the API key guard validation is applied
 
 #### Scenario: Codex usage excluded from API key guard scope
@@ -131,6 +131,8 @@ The dependency SHALL raise a domain exception on validation failure. The excepti
 
 The system SHALL enforce per-key model restrictions in the proxy service layer (not middleware). When `allowed_models` is set (non-null, non-empty) and the requested model is not in the list, the system MUST reject the request. The `/v1/models` endpoint MUST filter the model list based on the authenticated key's `allowed_models`.
 
+For fixed-model endpoints such as `/v1/audio/transcriptions` and `/backend-api/transcribe`, the service MUST evaluate restrictions against fixed effective model `gpt-4o-transcribe`.
+
 #### Scenario: Requested model not allowed
 
 - **WHEN** a key has `allowed_models: ["o3-pro"]` and a request is made for model `gpt-4.1`
@@ -150,6 +152,11 @@ The system SHALL enforce per-key model restrictions in the proxy service layer (
 
 - **WHEN** `api_key_auth_enabled` is false and a request is made to `/v1/models`
 - **THEN** the full model catalog is returned
+
+#### Scenario: Fixed transcription model not allowed
+
+- **WHEN** a key has `allowed_models: ["gpt-5.1"]` and a request is made to `/v1/audio/transcriptions` or `/backend-api/transcribe`
+- **THEN** the proxy returns 403 with OpenAI-format error code `model_not_allowed` for model `gpt-4o-transcribe`
 
 ### Requirement: Weekly token usage tracking
 
@@ -212,6 +219,32 @@ The SPA settings page SHALL include an API Key management section with: a toggle
 - **WHEN** admin toggles `apiKeyAuthEnabled` in settings
 - **THEN** the system calls `PUT /api/settings` and reflects the new state
 
+### Requirement: Cost accounting uses model and service-tier pricing
+When computing API key `cost_usd` usage, the system MUST price requests using the resolved model pricing and the authoritative `service_tier` reported by the upstream response when available, falling back to the forwarded request `service_tier` only when the response omits it. Requests sent with non-standard service tiers MUST use the published pricing for the tier actually used instead of falling back to standard-tier pricing.
+
+#### Scenario: Priority-tier request increments cost limit
+- **WHEN** an authenticated request for a priced model is finalized with `service_tier: "priority"`
+- **THEN** the system computes `cost_usd` using the priority-tier rate for that model
+
+#### Scenario: Flex-tier request increments cost limit
+- **WHEN** an authenticated request for a priced model is finalized with `service_tier: "flex"`
+- **THEN** the system computes `cost_usd` using the flex-tier rate for that model
+
+#### Scenario: Standard-tier request keeps standard pricing
+- **WHEN** an authenticated request for the same model is finalized without `service_tier`
+- **THEN** the system computes `cost_usd` using the standard-tier rate
+
+### Requirement: gpt-5.4 pricing is recognized
+The system MUST recognize `gpt-5.4` pricing when computing request costs. For standard-tier requests with more than 272K input tokens, the system MUST apply the published higher long-context rates.
+
+#### Scenario: gpt-5.4 request priced at standard tier
+- **WHEN** a request for `gpt-5.4` completes with standard service tier
+- **THEN** the system computes non-zero cost using the configured `gpt-5.4` standard rates
+
+#### Scenario: gpt-5.4 long-context request priced at long-context rates
+- **WHEN** a standard-tier `gpt-5.4` request completes with more than 272K input tokens
+- **THEN** the system computes cost using the configured long-context `gpt-5.4` rates
+
 ### Requirement: Model-scoped limit enforcement
 
 The system SHALL separate authentication validation from quota enforcement. `validate_key()` in the auth guard SHALL only verify key validity (existence, active status, expiry, basic reset). Quota enforcement SHALL occur at a point where the request model is known.
@@ -223,7 +256,7 @@ Limit applicability rules:
 
 For model-less requests (e.g., `/v1/models`), only global limits SHALL be evaluated.
 
-The service contract SHALL be typed explicitly: `enforce_limits_for_request(key_id: str, *, request_model: str | None) -> None`.
+The service contract SHALL be typed explicitly: `enforce_limits_for_request(key_id: str, *, request_model: str | None, request_service_tier: str | None = None) -> None`.
 
 #### Scenario: Model-scoped limit does not block other models
 
@@ -409,4 +442,19 @@ Reservation 생성 후 upstream API 호출에 진입하지 않고 종료되는 �
 
 - **WHEN** 동일 `reservation_id`로 `finalize_usage_reservation()`이 2회 호출되면
 - **THEN** 사용량은 정확히 1회만 반영되어야 한다 (SHALL)
+
+### Requirement: gpt-5.4-mini pricing is recognized
+
+The system MUST recognize `gpt-5.4-mini` pricing when computing request costs. Snapshot aliases for the same model family MUST resolve to the canonical `gpt-5.4-mini` price table entry.
+
+#### Scenario: gpt-5.4-mini request priced at standard tier
+
+- **WHEN** a request for `gpt-5.4-mini` completes with standard service tier
+- **THEN** the system computes non-zero cost using the configured `gpt-5.4-mini` standard rates
+
+#### Scenario: gpt-5.4-mini snapshot request priced at canonical rates
+
+- **WHEN** a request for `gpt-5.4-mini-2026-03-17` completes
+- **THEN** the system resolves the snapshot alias to `gpt-5.4-mini`
+- **AND** the system applies the same standard rates
 

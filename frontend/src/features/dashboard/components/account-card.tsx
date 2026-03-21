@@ -1,5 +1,6 @@
 import { Clock, ExternalLink, Play, RotateCcw } from "lucide-react";
 
+import { usePrivacyStore } from "@/hooks/use-privacy";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/status-badge";
 import { cn } from "@/lib/utils";
@@ -65,6 +66,7 @@ function QuotaBar({
 }
 
 export function AccountCard({ account, showAccountId = false, onAction }: AccountCardProps) {
+  const blurred = usePrivacyStore((s) => s.blurred);
   const status = normalizeStatus(account.status);
   const primaryRemaining = account.usage?.primaryRemainingPercent ?? null;
   const secondaryRemaining = account.usage?.secondaryRemainingPercent ?? null;
@@ -79,18 +81,21 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
     account.displayName && account.displayName !== account.email
       ? account.email
       : null;
-  const heading = showAccountId && !emailSubtitle ? `${title} (${compactId})` : title;
-  const subtitle = showAccountId && emailSubtitle ? `${emailSubtitle} | ID ${compactId}` : emailSubtitle;
+  const idSuffix = showAccountId ? ` (${compactId})` : "";
 
   return (
     <div className="card-hover rounded-xl border bg-card p-4">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-tight">{heading}</p>
-          {subtitle ? (
+          <p className="truncate text-sm font-semibold leading-tight">
+            {blurred
+              ? <><span className="privacy-blur">{title}</span>{!emailSubtitle ? idSuffix : ""}</>
+              : <>{title}{!emailSubtitle ? idSuffix : ""}</>}
+          </p>
+          {emailSubtitle ? (
             <p className="mt-0.5 truncate text-xs text-muted-foreground" title={showAccountId ? `ID konta ${account.accountId}` : undefined}>
-              {subtitle}
+              <span className={blurred ? "privacy-blur" : undefined}>{emailSubtitle}</span>{showAccountId ? ` | ID ${compactId}` : ""}
             </p>
           ) : null}
         </div>
@@ -99,8 +104,8 @@ export function AccountCard({ account, showAccountId = false, onAction }: Accoun
 
       {/* Quota bars */}
       <div className={cn("mt-3.5 grid gap-3", weeklyOnly ? "grid-cols-1" : "grid-cols-2")}>
-        {!weeklyOnly && <QuotaBar label="Główne" percent={primaryRemaining} resetLabel={primaryReset} />}
-        <QuotaBar label="Wtórne" percent={secondaryRemaining} resetLabel={secondaryReset} />
+        {!weeklyOnly && <QuotaBar label="5h" percent={primaryRemaining} resetLabel={primaryReset} />}
+        <QuotaBar label="Tygodniowe" percent={secondaryRemaining} resetLabel={secondaryReset} />
       </div>
 
       {/* Actions */}
