@@ -26,22 +26,22 @@ export function useStickySessions() {
   const deleteMutation = useMutation({
     mutationFn: (target: StickySessionIdentifier) => deleteStickySession(target),
     onSuccess: () => {
-      toast.success("Sticky session removed");
+      toast.success("Sesja sticky usunięta");
       invalidate();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to remove sticky session");
+      toast.error(error.message || "Nie udało się usunąć sesji sticky");
     },
   });
 
   const purgeMutation = useMutation({
     mutationFn: (staleOnly: boolean) => purgeStickySessions({ staleOnly }),
     onSuccess: (response) => {
-      toast.success(`Purged ${response.deletedCount} sticky sessions`);
+      toast.success(`Usunięto ${response.deletedCount} sesji sticky`);
       invalidate();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to purge sticky sessions");
+      toast.error(error.message || "Nie udało się usunąć sesji sticky");
     },
   });
 

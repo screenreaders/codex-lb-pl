@@ -22,7 +22,7 @@ import { getErrorMessageOrNull } from "@/utils/errors";
 import { formatTimeLong } from "@/utils/formatters";
 
 function modeLabel(mode: "allow_all" | "allowlist_active"): string {
-  return mode === "allow_all" ? "Allow all" : "Allowlist active";
+  return mode === "allow_all" ? "Zezwól wszystkim" : "Lista dozwolonych aktywna";
 }
 
 export function FirewallSection() {
@@ -58,8 +58,8 @@ export function FirewallSection() {
           <Shield className="h-4 w-4 text-primary" aria-hidden="true" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold">Firewall</h3>
-          <p className="text-xs text-muted-foreground">Restrict proxy APIs to allowed client IPs.</p>
+          <h3 className="text-sm font-semibold">Zapora</h3>
+          <p className="text-xs text-muted-foreground">Ogranicz proxy API do dozwolonych adresów IP klientów.</p>
         </div>
       </div>
 
@@ -67,12 +67,12 @@ export function FirewallSection() {
 
       <div className="flex items-center gap-3 rounded-lg border px-3 py-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Mode</span>
+          <span className="text-xs text-muted-foreground">Tryb</span>
           <Badge variant="outline">{modeLabel(mode)}</Badge>
         </div>
         <div className="h-4 w-px bg-border" />
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">Allowed IPs</span>
+          <span className="text-xs text-muted-foreground">Dozwolone IP</span>
           <span className="text-sm font-medium tabular-nums">{entries.length}</span>
         </div>
       </div>
@@ -86,7 +86,7 @@ export function FirewallSection() {
               void handleAdd();
             }
           }}
-          placeholder="127.0.0.1 or 2001:db8::1"
+          placeholder="127.0.0.1 lub 2001:db8::1"
           className="h-8 text-xs"
           disabled={busy}
         />
@@ -97,7 +97,7 @@ export function FirewallSection() {
           onClick={() => void handleAdd()}
           disabled={busy || !ipAddress.trim()}
         >
-          Add IP
+          Dodaj IP
         </Button>
       </div>
 
@@ -108,17 +108,17 @@ export function FirewallSection() {
       ) : entries.length === 0 ? (
         <EmptyState
           icon={Shield}
-          title="No IPs on the allowlist"
-          description="Firewall is currently in allow-all mode."
+          title="Brak IP na liście dozwolonych"
+          description="Zapora jest obecnie w trybie zezwalania wszystkim."
         />
       ) : (
         <div className="overflow-x-auto rounded-xl border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>IP Address</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="w-[96px] text-right">Actions</TableHead>
+                <TableHead>Adres IP</TableHead>
+                <TableHead>Utworzono</TableHead>
+                <TableHead className="w-[96px] text-right">Akcje</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -139,7 +139,7 @@ export function FirewallSection() {
                         disabled={busy}
                         onClick={() => deleteDialog.show(entry.ipAddress)}
                       >
-                        Remove
+                        Usuń
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -152,9 +152,9 @@ export function FirewallSection() {
 
       <ConfirmDialog
         open={deleteDialog.open}
-        title="Remove IP from allowlist"
-        description={`${deleteDialog.data ?? ""} will no longer be allowed through the firewall.`}
-        confirmLabel="Remove"
+        title="Usuń IP z listy dozwolonych"
+        description={`${deleteDialog.data ?? ""} nie będzie już dozwolone przez zaporę.`}
+        confirmLabel="Usuń"
         onOpenChange={deleteDialog.onOpenChange}
         onConfirm={() => {
           if (!deleteDialog.data) {

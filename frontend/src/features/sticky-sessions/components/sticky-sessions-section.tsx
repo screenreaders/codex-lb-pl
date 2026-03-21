@@ -24,11 +24,11 @@ import { formatTimeLong } from "@/utils/formatters";
 function kindLabel(kind: StickySessionKind): string {
   switch (kind) {
     case "codex_session":
-      return "Codex session";
+      return "Sesja Codex";
     case "sticky_thread":
-      return "Sticky thread";
+      return "Stały wątek";
     case "prompt_cache":
-      return "Prompt cache";
+      return "Cache promptów";
   }
 }
 
@@ -56,9 +56,9 @@ export function StickySessionsSection() {
           <Pin className="h-4 w-4 text-primary" aria-hidden="true" />
         </div>
         <div>
-          <h3 className="text-sm font-semibold">Sticky sessions</h3>
+          <h3 className="text-sm font-semibold">Sesje sticky</h3>
           <p className="text-xs text-muted-foreground">
-            Inspect durable mappings and purge stale prompt-cache affinity rows.
+            Przeglądaj trwałe mapowania i usuwaj przestarzałe wpisy cache promptów.
           </p>
         </div>
       </div>
@@ -66,13 +66,13 @@ export function StickySessionsSection() {
       {mutationError ? <AlertMessage variant="error">{mutationError}</AlertMessage> : null}
 
       <div className="flex flex-col gap-3 rounded-lg border px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Visible rows</span>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+            <span className="text-xs text-muted-foreground">Widoczne wiersze</span>
             <span className="text-sm font-medium tabular-nums">{entries.length}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Stale prompt-cache</span>
+            <span className="text-xs text-muted-foreground">Przestarzały cache promptów</span>
             <span className="text-sm font-medium tabular-nums">{staleCount}</span>
           </div>
         </div>
@@ -84,7 +84,7 @@ export function StickySessionsSection() {
           disabled={busy || staleCount === 0}
           onClick={() => purgeDialog.show()}
         >
-          Purge stale
+          Usuń przestarzałe
         </Button>
       </div>
 
@@ -95,20 +95,20 @@ export function StickySessionsSection() {
       ) : entries.length === 0 ? (
         <EmptyState
           icon={Pin}
-          title="No sticky sessions"
-          description="Sticky mappings appear here after routed requests create them."
+          title="Brak sesji sticky"
+          description="Mapowania sticky pojawią się tutaj po utworzeniu przez routowane żądania."
         />
       ) : (
         <div className="overflow-x-auto rounded-xl border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Key</TableHead>
-                <TableHead>Kind</TableHead>
-                <TableHead>Account</TableHead>
-                <TableHead>Updated</TableHead>
-                <TableHead>Expiry</TableHead>
-                <TableHead className="w-[96px] text-right">Actions</TableHead>
+                <TableHead>Klucz</TableHead>
+                <TableHead>Typ</TableHead>
+                <TableHead>Konto</TableHead>
+                <TableHead>Zaktualizowano</TableHead>
+                <TableHead>Ważność</TableHead>
+                <TableHead className="w-[96px] text-right">Akcje</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -129,11 +129,11 @@ export function StickySessionsSection() {
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {entry.isStale ? (
-                        <Badge variant="secondary">Stale</Badge>
+                        <Badge variant="secondary">Przestarzałe</Badge>
                       ) : expires ? (
                         `${expires.date} ${expires.time}`
                       ) : (
-                        "Durable"
+                        "Trwałe"
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -145,7 +145,7 @@ export function StickySessionsSection() {
                         disabled={busy}
                         onClick={() => deleteDialog.show({ key: entry.key, kind: entry.kind })}
                       >
-                        Remove
+                        Usuń
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -158,13 +158,13 @@ export function StickySessionsSection() {
 
       <ConfirmDialog
         open={deleteDialog.open}
-        title="Remove sticky session"
+        title="Usuń sesję sticky"
         description={
           deleteDialog.data
-            ? `${kindLabel(deleteDialog.data.kind)} mapping ${deleteDialog.data.key} will stop pinning future requests.`
+            ? `Mapowanie ${kindLabel(deleteDialog.data.kind)} ${deleteDialog.data.key} przestanie przypinać przyszłe żądania.`
             : ""
         }
-        confirmLabel="Remove"
+        confirmLabel="Usuń"
         onOpenChange={deleteDialog.onOpenChange}
         onConfirm={() => {
           if (!deleteDialog.data) {
@@ -178,9 +178,9 @@ export function StickySessionsSection() {
 
       <ConfirmDialog
         open={purgeDialog.open}
-        title="Purge stale prompt-cache mappings"
-        description="Only expired prompt-cache entries will be deleted. Durable session and sticky-thread mappings stay intact."
-        confirmLabel="Purge"
+        title="Usuń przestarzałe mapowania cache promptów"
+        description="Usunięte zostaną tylko wygasłe wpisy cache promptów. Mapowania sesji trwałych i sticky-thread pozostaną bez zmian."
+        confirmLabel="Usuń"
         onOpenChange={purgeDialog.onOpenChange}
         onConfirm={() => {
           void purgeMutation.mutateAsync(true).finally(() => {

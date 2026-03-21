@@ -21,22 +21,22 @@ export function useFirewall() {
   const createMutation = useMutation({
     mutationFn: (ipAddress: string) => createFirewallIp({ ipAddress }),
     onSuccess: () => {
-      toast.success("IP added to firewall");
+      toast.success("IP dodane do zapory");
       invalidate();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to add firewall IP");
+      toast.error(error.message || "Nie udało się dodać IP do zapory");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (ipAddress: string) => deleteFirewallIp(ipAddress),
     onSuccess: () => {
-      toast.success("IP removed from firewall");
+      toast.success("IP usunięte z zapory");
       invalidate();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to remove firewall IP");
+      toast.error(error.message || "Nie udało się usunąć IP z zapory");
     },
   });
 

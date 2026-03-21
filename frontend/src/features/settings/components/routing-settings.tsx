@@ -51,9 +51,9 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
         <div className="divide-y rounded-lg border">
           <div className="flex items-center justify-between gap-4 p-3">
             <div>
-              <p className="text-sm font-medium">Upstream stream transport</p>
+              <p className="text-sm font-medium">Transport strumienia upstream</p>
               <p className="text-xs text-muted-foreground">
-                Choose how `codex-lb` connects upstream for streaming responses.
+                Wybierz sposób, w jaki `codex-lb` łączy się upstream dla strumieniowanych odpowiedzi.
               </p>
             </div>
             <Select
@@ -66,18 +66,18 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="default">Server default</SelectItem>
+                <SelectItem value="default">Domyślne serwera</SelectItem>
                 <SelectItem value="auto">Auto</SelectItem>
-                <SelectItem value="http">Responses</SelectItem>
-                <SelectItem value="websocket">WebSockets</SelectItem>
+                <SelectItem value="http">Odpowiedzi</SelectItem>
+                <SelectItem value="websocket">WebSockety</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between gap-4 p-3">
             <div>
-              <p className="text-sm font-medium">Routing strategy</p>
-              <p className="text-xs text-muted-foreground">Choose usage-based balancing or strict round robin.</p>
+              <p className="text-sm font-medium">Strategia routingu</p>
+              <p className="text-xs text-muted-foreground">Wybierz równoważenie wg użycia lub ścisły round robin.</p>
             </div>
             <Select
               value={settings.routingStrategy}
@@ -87,7 +87,7 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
                 <SelectValue />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="usage_weighted">Usage weighted</SelectItem>
+                <SelectItem value="usage_weighted">Ważone użyciem</SelectItem>
                 <SelectItem value="round_robin">Round robin</SelectItem>
               </SelectContent>
             </Select>
@@ -119,9 +119,9 @@ export function RoutingSettings({ settings, busy, onSave }: RoutingSettingsProps
 
           <div className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium">Prompt-cache affinity TTL</p>
+              <p className="text-sm font-medium">TTL powiązania cache promptów</p>
               <p className="text-xs text-muted-foreground">
-                Keep OpenAI-style prompt-cache mappings warm for a bounded number of seconds.
+                Utrzymuj mapowania cache promptów w stylu OpenAI przez określoną liczbę sekund.
               </p>
             </div>
             <div className="flex items-center gap-2">
